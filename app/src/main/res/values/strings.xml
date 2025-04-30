@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Weather</string>
+    <string name="search_location">Search Location</string>
+    <string name="city_name">City Name</string>
+    <string name="_20">20</string>
+    <string name="time">TIME</string>
+    <string name="uv">UV</string>
+    <string name="rain">RAIN</string>
+    <string name="aq">AQ</string>
+    <string name="sunrise_amp_sunset">SUNRISE &amp; SUNSET</string>
+    <string name="sunrise">SUNRISE</string>
+    <string name="sunset">SUNSET</string>
+    <string name="length_of_day">LENGTH OF DAY</string>
+    <string name="remaining_daylight">REMAINING DAYLIGHT</string>
+    <string name="daylight">DAYLIGHT</string>
+    <string name="wind">WIND</string>
+</resources>
