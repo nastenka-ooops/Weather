@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.weather.api.OpenMeteoApi
 import com.example.weather.dto.WeatherResponse
+import com.example.whether.R
 import com.example.whether.databinding.WeatherLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,6 +57,7 @@ class WeatherActivity : ComponentActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateUI(weatherData: WeatherResponse) {
         binding.apply {
+            updateIcon(weatherData.current_weather.weathercode)
 
             tvTemperature.text = "${weatherData.current_weather.temperature}°"
 
@@ -96,9 +98,25 @@ class WeatherActivity : ComponentActivity() {
 
         val remainingInMinutes = sunsetInMinutes - currentInMinutes
 
-        val remainingHours = (remainingInMinutes / 60)
-        val remainingMins = (remainingInMinutes % 60)
+        var remainingHours = (remainingInMinutes / 60)
+        if (remainingHours < 0) remainingHours = 0
+        var remainingMins = (remainingInMinutes % 60)
+        if (remainingMins < 0) remainingMins = 0
 
         return "${remainingHours}H ${remainingMins}M"
+    }
+
+    private fun updateIcon(weatherCode: Int) {
+        when (weatherCode) {
+            0 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_clear)
+            1 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_partly_cloudy)
+            2, 3 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_mostly_cloudy)
+            45, 48 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_fog)
+            in 51..57 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_drizzle)
+            in 61..67 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+            in 71..77 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_snow)
+            in 80..86 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+            in 95..99 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_tunderstorm)
+        }
     }
 }
