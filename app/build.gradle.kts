@@ -77,4 +77,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx.v251)
 
     implementation (libs.play.services.location)
+    implementation( libs.androidx.cardview)
+    implementation(libs.androidx.recyclerview)
 }

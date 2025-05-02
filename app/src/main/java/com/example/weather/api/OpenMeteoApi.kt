@@ -1,6 +1,8 @@
 package com.example.weather.api
 
 import com.example.weather.dto.AirQualityResponse
+import com.example.weather.dto.LocationResponse
+import com.example.weather.dto.LocationsList
 import com.example.weather.dto.WeatherResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -25,4 +27,9 @@ interface OpenMeteoApi {
         @Query("timezone") timezone: String = "auto",
         @Query("current") current: Boolean = true
     ): AirQualityResponse
+
+    @GET("v1/search")
+    suspend fun getLocations(
+        @Query("name") name: String
+    ): LocationsList
 }

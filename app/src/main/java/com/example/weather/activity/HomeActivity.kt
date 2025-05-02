@@ -1,49 +1,45 @@
-package com.example.weather
+package com.example.weather.activity
 
-import LocationHelper
+import LocationUtils
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.weather.api.OpenMeteoApi
 import com.example.weather.dto.WeatherResponse
-import com.example.whether.R
-import com.example.whether.databinding.WeatherLayoutBinding
+import com.example.weather.utils.WeatherUtils
+import com.example.whether.databinding.HomeLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class WeatherActivity : ComponentActivity() {
-    private lateinit var binding: WeatherLayoutBinding
-    private lateinit var locationHelper: LocationHelper
+class HomeActivity : ComponentActivity() {
+    private lateinit var binding: HomeLayoutBinding
+    private lateinit var locationUtils: LocationUtils
+    private var weatherUtils: WeatherUtils = WeatherUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = WeatherLayoutBinding.inflate(layoutInflater)
+        binding = HomeLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        locationHelper = LocationHelper(this)
-        locationHelper.getCurrentLocation(
+        locationUtils = LocationUtils(this)
+        locationUtils.getCurrentLocation(
             onSuccess = { lat, lon ->
-                val cityName = locationHelper.getCityName(lat, lon)
-                binding.tvCityName.text = cityName
+                val cityName = locationUtils.getCityName(lat, lon)
+                binding.weatherLayout.tvCityName.text = cityName
                 fetchWeatherData(lat, lon)
             }
         )
 
-        binding.etSearchLocation.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                performSearch(s.toString())
-            }
-        })
+        binding.etSearchLocation.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun fetchWeatherData(lat: Double, lon: Double) {
@@ -68,10 +64,15 @@ class WeatherActivity : ComponentActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(weatherData: WeatherResponse) {
-        binding.apply {
+        binding.weatherLayout.apply {
             val isDay = weatherData.current_weather.is_day == 1
 
-            updateIcon(weatherData.current_weather.weathercode, isDay)
+            ivWeatherIcon.setImageResource(
+                weatherUtils.getWeatherIcon(
+                    weatherData.current_weather.weathercode,
+                    isDay
+                )
+            )
 
             tvTemperature.text = "${weatherData.current_weather.temperature}°"
 
@@ -117,38 +118,5 @@ class WeatherActivity : ComponentActivity() {
         if (remainingMins < 0) remainingMins = 0
 
         return "${remainingHours}H ${remainingMins}M"
-    }
-
-    private fun updateIcon(weatherCode: Int, isDay: Boolean) {
-        if (isDay) {
-            when (weatherCode) {
-                0 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_clear)
-                1 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_partly_cloudy)
-                2 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_mostly_cloudy)
-                3 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_cloudy)
-                45, 48 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_fog)
-                in 51..57 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_drizzle)
-                in 61..67 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
-                in 71..77 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_snow)
-                in 80..86 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
-                in 95..99 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_tunderstorm)
-            }
-        } else {
-            when (weatherCode) {
-                0 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_clear_night)
-                1 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_partly_cloudy_night)
-                2 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_mostly_cloudy_night)
-                3 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_cloudy)
-                45, 48 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_fog)
-                in 51..57 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_drizzle)
-                in 61..67 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
-                in 71..77 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_snow)
-                in 80..86 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
-                in 95..99 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_tunderstorm)
-            }
-        }
-    }
-
-    private fun performSearch(query: String) {
     }
 }

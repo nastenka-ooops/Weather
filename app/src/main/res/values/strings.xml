@@ -14,4 +14,5 @@
     <string name="remaining_daylight">REMAINING DAYLIGHT</string>
     <string name="daylight">DAYLIGHT</string>
     <string name="wind">WIND</string>
+    <string name="add_to_list">Add to list   </string>
 </resources>
