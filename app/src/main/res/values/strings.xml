@@ -15,4 +15,5 @@
     <string name="daylight">DAYLIGHT</string>
     <string name="wind">WIND</string>
     <string name="add_to_list">Add to list   </string>
+    <string name="hourly_forecast">HOURLY FORECAST</string>
 </resources>
