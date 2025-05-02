@@ -5,5 +5,6 @@ data class CurrentWeather(
     val temperature: Float,
     val windspeed: Float,
     val weathercode: Int,
-    val time: String
+    val time: String,
+    val is_day: Int
 )

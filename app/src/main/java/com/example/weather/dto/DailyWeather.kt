@@ -5,5 +5,5 @@ data class DailyWeather(
     val sunset: List<String>,
     val uv_index_max: List<Float>,
     val precipitation_probability_mean: List<Int>,
-    var daylight_duration: List<Float>
+    val daylight_duration: List<Float>
 )

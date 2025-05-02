@@ -23,14 +23,15 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <!-- Search Location -->
-            <TextView
+            <EditText
+                android:id="@+id/et_search_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/round_grey_shape"
                 android:drawableEnd="@drawable/ic_search"
                 android:fontFamily="@font/poppins_regular"
                 android:padding="10dp"
-                android:text="@string/search_location"
+                android:hint="@string/search_location"
                 android:textColor="@color/grey"
                 android:textSize="16sp" />
 

@@ -3,6 +3,8 @@ package com.example.weather
 import LocationHelper
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.weather.api.OpenMeteoApi
@@ -32,6 +34,16 @@ class WeatherActivity : ComponentActivity() {
                 fetchWeatherData(lat, lon)
             }
         )
+
+        binding.etSearchLocation.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                performSearch(s.toString())
+            }
+        })
     }
 
     private fun fetchWeatherData(lat: Double, lon: Double) {
@@ -57,12 +69,13 @@ class WeatherActivity : ComponentActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateUI(weatherData: WeatherResponse) {
         binding.apply {
-            updateIcon(weatherData.current_weather.weathercode)
+            val isDay = weatherData.current_weather.is_day == 1
+
+            updateIcon(weatherData.current_weather.weathercode, isDay)
 
             tvTemperature.text = "${weatherData.current_weather.temperature}°"
 
             val currentTime = weatherData.current_weather.time.substring(11, 16)
-
             tvTime.text = currentTime
 
             tvUv.text = weatherData.daily.uv_index_max[0].toString()
@@ -106,17 +119,36 @@ class WeatherActivity : ComponentActivity() {
         return "${remainingHours}H ${remainingMins}M"
     }
 
-    private fun updateIcon(weatherCode: Int) {
-        when (weatherCode) {
-            0 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_clear)
-            1 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_partly_cloudy)
-            2, 3 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_mostly_cloudy)
-            45, 48 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_fog)
-            in 51..57 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_drizzle)
-            in 61..67 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
-            in 71..77 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_snow)
-            in 80..86 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
-            in 95..99 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_tunderstorm)
+    private fun updateIcon(weatherCode: Int, isDay: Boolean) {
+        if (isDay) {
+            when (weatherCode) {
+                0 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_clear)
+                1 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_partly_cloudy)
+                2 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_mostly_cloudy)
+                3 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_cloudy)
+                45, 48 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_fog)
+                in 51..57 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_drizzle)
+                in 61..67 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+                in 71..77 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_snow)
+                in 80..86 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+                in 95..99 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_tunderstorm)
+            }
+        } else {
+            when (weatherCode) {
+                0 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_clear_night)
+                1 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_partly_cloudy_night)
+                2 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_mostly_cloudy_night)
+                3 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_cloudy)
+                45, 48 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_fog)
+                in 51..57 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_drizzle)
+                in 61..67 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+                in 71..77 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_snow)
+                in 80..86 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_rain)
+                in 95..99 -> binding.ivWeatherIcon.setImageResource(R.drawable.ic_tunderstorm)
+            }
         }
+    }
+
+    private fun performSearch(query: String) {
     }
 }
