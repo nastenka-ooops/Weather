@@ -48,7 +48,7 @@ class HourlyWeatherAdapter : RecyclerView.Adapter<HourlyWeatherAdapter.WeatherHo
         holder.bind(hourlyWeatherList[position])
     }
 
-    fun setLocationsList(list: List<HourlyWeatherItem>) {
+    fun setWeatherList(list: List<HourlyWeatherItem>) {
         hourlyWeatherList.clear()
         hourlyWeatherList.addAll(list)
         notifyDataSetChanged()
