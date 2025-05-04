@@ -6,7 +6,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.weather.adapter.DailyWeatherAdapter
+import com.example.weather.adapter.HourlyWeatherAdapter
 import com.example.weather.api.OpenMeteoApi
+import com.example.weather.dto.DailyWeatherItem
+import com.example.weather.dto.HourlyWeatherItem
 import com.example.weather.dto.WeatherResponse
 import com.example.weather.utils.WeatherUtils
 import com.example.whether.databinding.HomeLayoutBinding
@@ -18,6 +23,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class HomeActivity : ComponentActivity() {
     private lateinit var binding: HomeLayoutBinding
+    private lateinit var hourlyAdapter: HourlyWeatherAdapter
+    private lateinit var dailyAdapter: DailyWeatherAdapter
     private lateinit var locationUtils: LocationUtils
     private var weatherUtils: WeatherUtils = WeatherUtils()
 
@@ -69,6 +76,7 @@ class HomeActivity : ComponentActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(weatherData: WeatherResponse) {
+        val currentTime: String
         binding.weatherLayout.apply {
             val isDay = weatherData.current_weather.is_day == 1
 
@@ -81,7 +89,7 @@ class HomeActivity : ComponentActivity() {
 
             tvTemperature.text = "${weatherData.current_weather.temperature}°"
 
-            val currentTime = weatherData.current_weather.time.substring(11, 16)
+            currentTime = weatherData.current_weather.time.substring(11, 16)
             tvTime.text = currentTime
 
             tvUv.text = weatherData.daily.uv_index_max[0].toString()
@@ -102,6 +110,45 @@ class HomeActivity : ComponentActivity() {
             val remainingDaylight = calculateRemainingDaylight(sunset, currentTime)
             tvRemainingDaylight.text = remainingDaylight
         }
+
+        hourlyAdapter = HourlyWeatherAdapter()
+
+        binding.weatherLayout.rvHourlyForecast.layoutManager =
+            LinearLayoutManager(
+                this,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+        binding.weatherLayout.rvHourlyForecast.adapter = hourlyAdapter
+        val hourlyWeatherItems = weatherData.hourly.time.indices
+            .filter { index ->
+                val hour = weatherData.hourly.time[index].substring(11, 13).toInt()
+                hour >= currentTime.substring(0,2).toInt()
+            }
+            .map { index ->
+                HourlyWeatherItem(
+                    time = weatherData.hourly.time[index],
+                    temperature = weatherData.hourly.temperature_2m[index],
+                    weatherCode = weatherData.hourly.weather_code[index],
+                    isDay = weatherData.hourly.is_day[index]
+                )
+            }
+        hourlyAdapter.setWeatherList(hourlyWeatherItems)
+
+        dailyAdapter = DailyWeatherAdapter()
+
+        binding.weatherLayout.rvDailyForecast.layoutManager = LinearLayoutManager(this)
+        binding.weatherLayout.rvDailyForecast.adapter = dailyAdapter
+        val dailyWeatherItems = weatherData.daily.time.indices
+            .map { index ->
+                DailyWeatherItem(
+                    time = weatherData.daily.time[index],
+                    temperatureDay = weatherData.daily.temperature_2m_max[index],
+                    temperatureNight = weatherData.daily.temperature_2m_min[index],
+                    weatherCode = weatherData.daily.weather_code[index]
+                )
+            }
+        dailyAdapter.setWeatherList(dailyWeatherItems)
     }
 
     private fun calculateRemainingDaylight(sunset: String, curent: String): String {

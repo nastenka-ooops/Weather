@@ -14,6 +14,11 @@
     <string name="remaining_daylight">REMAINING DAYLIGHT</string>
     <string name="daylight">DAYLIGHT</string>
     <string name="wind">WIND</string>
+    <string name="hourly_forecast">HOURLY FORECAST</string>
+    <string name="day">DAY</string>
+    <string name="day_lower">day</string>
+    <string name="night">night</string>
+    <string name="daily_forecast">DAILY FORECAST</string>
     <string name="saved_locations">Saved Locations</string>
     <string name="no_saved_locations">No saved locations yet</string>
     <string name="add_to_list">Add to list</string>

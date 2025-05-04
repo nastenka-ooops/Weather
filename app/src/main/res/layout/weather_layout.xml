@@ -182,7 +182,57 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Sunrise & Sunset -->
+    <TextView
+        android:id="@+id/tv_hourly_forecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginVertical="10dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/hourly_forecast"
+        android:textColor="@color/grey"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_whether_info" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_hourly_forecast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:foregroundGravity="top"
+        android:overScrollMode="never"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_hourly_forecast"
+        />
+
+    <TextView
+        android:id="@+id/tv_daily_forecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginVertical="10dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/daily_forecast"
+        android:textColor="@color/grey"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rv_hourly_forecast" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_daily_forecast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:foregroundGravity="top"
+        android:overScrollMode="never"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_daily_forecast" />
+
     <TextView
         android:id="@+id/tv_sun"
         android:layout_width="wrap_content"
@@ -195,7 +245,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll_whether_info" />
+        app:layout_constraintTop_toBottomOf="@id/rv_daily_forecast" />
 
     <!-- Sunrise/Sunset Card -->
     <LinearLayout
@@ -208,7 +258,8 @@
         android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_sun">
+        app:layout_constraintTop_toBottomOf="@id/tv_sun"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
