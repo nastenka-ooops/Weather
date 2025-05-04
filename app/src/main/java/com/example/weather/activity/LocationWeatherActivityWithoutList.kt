@@ -1,9 +1,9 @@
 package com.example.weather.activity
 
-import LocationUtils
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,80 +14,44 @@ import com.example.weather.dto.DailyWeatherItem
 import com.example.weather.dto.HourlyWeatherItem
 import com.example.weather.dto.LocationResponse
 import com.example.weather.dto.WeatherResponse
-import com.example.weather.utils.SharedPreferencesHelper
 import com.example.weather.utils.WeatherUtils
-import com.example.whether.databinding.HomeLayoutBinding
+import com.example.whether.databinding.LocationWeatherLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.weather.utils.SharedPreferencesHelper
+import com.example.whether.databinding.LocationWeatherLayoutWithoutListBinding
 
-class HomeActivity : ComponentActivity() {
-    private lateinit var binding: HomeLayoutBinding
+class LocationWeatherActivityWithoutList : ComponentActivity() {
+    private lateinit var binding: LocationWeatherLayoutWithoutListBinding
     private lateinit var hourlyAdapter: HourlyWeatherAdapter
     private lateinit var dailyAdapter: DailyWeatherAdapter
-    private lateinit var locationUtils: LocationUtils
-    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
     private var weatherUtils: WeatherUtils = WeatherUtils()
+    private lateinit var location: LocationResponse
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = HomeLayoutBinding.inflate(layoutInflater)
+        binding = LocationWeatherLayoutWithoutListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-        locationUtils = LocationUtils(this)
-        locationUtils.getCurrentLocation(
-            onSuccess = { lat, lon ->
-                val cityName = locationUtils.getCityName(lat, lon)
-                binding.weatherLayout.tvCityName.text = cityName
-                fetchWeatherData(lat, lon)
-            }
-        )
 
-        binding.etSearchLocation.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java)
-            startActivity(intent)
+        location = (intent.getSerializableExtra("location") as? LocationResponse)!!
+
+        binding.weatherLayout.tvCityName.text = location.name
+        fetchWeatherData(location.latitude, location.longitude)
+
+        binding.btnBack.setOnClickListener {
+//            val intent = Intent(this, SearchActivity::class.java)
+//            startActivity(intent)
             finish()
         }
 
-        binding.btnSettings.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
-        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
 
-        if (selectedLocation != null) {
-            showSelectedLocation(selectedLocation)
-        } else {
-            getCurrentLocation()
-        }
     }
-
-    private fun showSelectedLocation(location: LocationResponse) {
-        binding.weatherLayout.tvCityName.text = location.name
-        fetchWeatherData(location.latitude, location.longitude)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
-        selectedLocation?.let {
-            showSelectedLocation(it)
-        }
-    }
-
-    private fun getCurrentLocation() {
-        locationUtils.getCurrentLocation(
-            onSuccess = { lat, lon ->
-                val cityName = locationUtils.getCityName(lat, lon)
-                binding.weatherLayout.tvCityName.text = cityName
-                fetchWeatherData(lat, lon)
-            }
-        )
-    }
-
 
     private fun fetchWeatherData(lat: Double, lon: Double) {
         lifecycleScope.launch {
@@ -145,7 +109,6 @@ class HomeActivity : ComponentActivity() {
             val remainingDaylight = calculateRemainingDaylight(sunset, currentTime)
             tvRemainingDaylight.text = remainingDaylight
         }
-
         hourlyAdapter = HourlyWeatherAdapter()
 
         binding.weatherLayout.rvHourlyForecast.layoutManager =
@@ -158,7 +121,7 @@ class HomeActivity : ComponentActivity() {
         val hourlyWeatherItems = weatherData.hourly.time.indices
             .filter { index ->
                 val hour = weatherData.hourly.time[index].substring(11, 13).toInt()
-                hour >= currentTime.substring(0,2).toInt()
+                hour >= currentTime.substring(0, 2).toInt()
             }
             .map { index ->
                 HourlyWeatherItem(
@@ -169,6 +132,7 @@ class HomeActivity : ComponentActivity() {
                 )
             }
         hourlyAdapter.setWeatherList(hourlyWeatherItems)
+
 
         dailyAdapter = DailyWeatherAdapter()
 
@@ -206,4 +170,5 @@ class HomeActivity : ComponentActivity() {
 
         return "${remainingHours}H ${remainingMins}M"
     }
+
 }

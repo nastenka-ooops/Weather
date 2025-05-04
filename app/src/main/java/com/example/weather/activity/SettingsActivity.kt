@@ -2,6 +2,7 @@ package com.example.weather.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,8 @@ class SettingsActivity : ComponentActivity() {
     private lateinit var binding: SettingsLayoutBinding
     private lateinit var adapter: SavedLocationsAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+    private var selectedLocation: LocationResponse? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,19 +31,33 @@ class SettingsActivity : ComponentActivity() {
         binding.btnBack.setOnClickListener {
             finish()
         }
+
+        selectedLocation = sharedPreferencesHelper.getSelectedLocation()
+        loadSavedLocations()
     }
 
     private fun setupRecyclerView() {
         adapter = SavedLocationsAdapter(
             onLocationClick = { location ->
-                val intent = Intent(this, LocationWeatherActivity::class.java)
+                // Переход к просмотру погоды
+                val intent = Intent(this, LocationWeatherActivityWithoutList::class.java)
                 intent.putExtra("location", location)
                 startActivity(intent)
             },
+            onSetDefaultClick = { location ->
+                // Установка как основной локации
+                sharedPreferencesHelper.saveSelectedLocation(location)
+                Toast.makeText(this, "${location.name} set as default", Toast.LENGTH_SHORT).show()
+            },
             onDeleteClick = { location ->
+                // Удаление локации
+                if (sharedPreferencesHelper.getSelectedLocation()?.name == location.name) {
+                    sharedPreferencesHelper.clearSelectedLocation()
+                }
                 sharedPreferencesHelper.removeLocation(location)
                 loadSavedLocations()
-            }
+            },
+            sharedPreferencesHelper = sharedPreferencesHelper
         )
 
         binding.rvSavedLocations.layoutManager = LinearLayoutManager(this)

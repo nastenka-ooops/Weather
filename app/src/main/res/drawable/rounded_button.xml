@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Цвет фона кнопки -->
+    <solid android:color="@color/light_grey" /> <!-- или любой другой цвет -->
+
+    <!-- Обводка (граница) -->
+    <stroke
+        android:width="3dp" android:color="@color/gray" />
+
+    <!-- Скругление углов -->
+    <corners android:radius="70dp" />
+
+    <!-- Отступы (необязательно) -->
+    <padding
+        android:left="16dp"
+        android:top="8dp"
+        android:right="16dp"
+        android:bottom="8dp" />
+</shape>

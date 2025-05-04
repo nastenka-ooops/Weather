@@ -22,4 +22,7 @@
     <string name="saved_locations">Saved Locations</string>
     <string name="no_saved_locations">No saved locations yet</string>
     <string name="add_to_list">Add to list</string>
+    <string name="use_current_location">Use current location</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="location_set_as_default">%s установлен как основной</string>
 </resources>

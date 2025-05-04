@@ -11,6 +11,29 @@ class SharedPreferencesHelper(context: Context) {
         context.getSharedPreferences("WeatherAppPrefs", Context.MODE_PRIVATE)
     private val gson = Gson()
     private val LOCATIONS_KEY = "saved_locations"
+    private val SELECTED_LOCATION_KEY = "selected_location"
+
+
+    fun saveSelectedLocation(location: LocationResponse) {
+        val json = gson.toJson(location)
+        sharedPreferences.edit().putString(SELECTED_LOCATION_KEY, json).apply()
+    }
+
+
+
+    fun getSelectedLocation(): LocationResponse? {
+        val json = sharedPreferences.getString(SELECTED_LOCATION_KEY, null)
+        return if (json != null) {
+            gson.fromJson(json, LocationResponse::class.java)
+        } else {
+            null
+        }
+    }
+
+    fun clearSelectedLocation() {
+        sharedPreferences.edit().remove(SELECTED_LOCATION_KEY).apply()
+    }
+
 
     fun saveLocation(location: LocationResponse) {
         val savedLocations = getSavedLocations().toMutableList()
