@@ -40,6 +40,11 @@ class HomeActivity : ComponentActivity() {
             startActivity(intent)
             finish()
         }
+
+        binding.btnSettings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun fetchWeatherData(lat: Double, lon: Double) {

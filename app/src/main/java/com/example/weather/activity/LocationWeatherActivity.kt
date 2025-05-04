@@ -3,6 +3,7 @@ package com.example.weather.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.weather.api.OpenMeteoApi
@@ -15,16 +16,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
+import com.example.weather.utils.SharedPreferencesHelper
 class LocationWeatherActivity : ComponentActivity() {
     private lateinit var binding: LocationWeatherLayoutBinding
     private var weatherUtils: WeatherUtils = WeatherUtils()
     private lateinit var location: LocationResponse
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = LocationWeatherLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
 
         location = (intent.getSerializableExtra("location") as? LocationResponse)!!
 
@@ -35,6 +39,11 @@ class LocationWeatherActivity : ComponentActivity() {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
             finish()
+        }
+
+        binding.btnAdd.setOnClickListener {
+            sharedPreferencesHelper.saveLocation(location)
+            Toast.makeText(this, "Location added to your list", Toast.LENGTH_SHORT).show()
         }
     }
 
