@@ -48,8 +48,22 @@
         android:background="@drawable/rounded_button"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+        app:layout_constraintEnd_toStartOf="@+id/tv_is_default"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_is_default"
+        android:layout_width="wrap_content"
+        android:layout_height="43dp"
+        android:text="Current"
+        android:background="@drawable/rounded_button"
+        android:textColor="@color/black"
+
+        android:visibility="gone"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/btn_set_default"
+        app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+        app:layout_constraintTop_toTopOf="@id/btn_set_default"/>
 
     <ImageButton
         android:id="@+id/btn_delete"
@@ -60,17 +74,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <TextView
-        android:id="@+id/tv_is_default"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Current"
-        android:background="@drawable/rounded_button"
-        android:textColor="@color/black"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/btn_set_default"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btn_set_default"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

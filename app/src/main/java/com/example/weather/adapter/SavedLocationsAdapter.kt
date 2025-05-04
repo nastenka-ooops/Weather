@@ -60,9 +60,10 @@ class SavedLocationsAdapter(
                 weatherUtils.getWeatherIcon(location.weatherCode, location.isDay == 1)
             )
         }
-
+        holder.ivWeatherIcon.visibility = View.VISIBLE
+        holder.btnDelete.visibility = View.VISIBLE
         // Проверяем, является ли эта локация основной
-        if (sharedPreferencesHelper.getSelectedLocation()?.name == location.name) {
+        if (isDefault) {
             holder.btnSetDefault.visibility = View.GONE
             holder.tvIsDefault.visibility = View.VISIBLE
         } else {
