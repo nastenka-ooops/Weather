@@ -81,4 +81,6 @@ dependencies {
     implementation(libs.androidx.recyclerview)
 
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.4.5")
+
 }

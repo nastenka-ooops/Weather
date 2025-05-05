@@ -16,6 +16,7 @@ import com.example.weather.api.OpenMeteoApi
 import com.example.weather.dto.*
 import com.example.weather.utils.AirQualityUtils
 import com.example.weather.utils.WeatherUtils
+import com.example.weather.view.SunPositionView
 import com.example.whether.R
 import com.example.whether.databinding.HomeLayoutBinding
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import org.threeten.bp.LocalTime
 
 class HomeActivity : ComponentActivity() {
     private lateinit var binding: HomeLayoutBinding
@@ -205,6 +207,14 @@ class HomeActivity : ComponentActivity() {
             false
         )
         recyclerView.adapter = WeatherDetailAdapter(weatherDetails)
+
+        val sunPositionView = SunPositionView(this)
+        binding.weatherLayout.sunPositionContainer.addView(sunPositionView)
+
+
+
+        sunPositionView.updateTime(weatherData.daily.sunrise[0], weatherData.daily.sunset[0], LocalTime.now().toString() )
+
 
     }
 
