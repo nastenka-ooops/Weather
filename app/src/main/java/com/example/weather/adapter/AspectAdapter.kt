@@ -17,12 +17,11 @@ class AspectAdapter : RecyclerView.Adapter<AspectAdapter.AspectHolder>() {
         private val binding = AspectItemLayoutBinding.bind(view)
         private val astroUtils = AstroUtils();
 
-        @SuppressLint("SetTextI18n")
         fun bind(aspect: AspectData) = with(binding) {
 
-            tvFirstPlanet.text = aspect.planet_1.en
-            tvSecondPlanet.text = aspect.planet_2.en
-            tvAspect.text = aspect.aspect.en
+            tvFirstPlanet.text = aspect.planet_1.en.take(5)
+            tvSecondPlanet.text = aspect.planet_2.en.take(5)
+            tvAspect.text = aspect.aspect.en.take(9)
 
             ivFirstPlanetIcon.setImageResource(
                 astroUtils.getPlanetIcon(aspect.planet_1.en)

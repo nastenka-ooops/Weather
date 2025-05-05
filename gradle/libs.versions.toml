@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.2"
+androidsvg = "1.4"
 cardview = "1.0.0"
 converterGsonVersion = "2.9.0"
 kotlin = "1.9.0"
@@ -19,6 +20,7 @@ retrofitVersion = "2.9.0"
 material = "1.12.0"
 
 [libraries]
+androidsvg = { module = "com.caverock:androidsvg", version.ref = "androidsvg" }
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx-v251 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }

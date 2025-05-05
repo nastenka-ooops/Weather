@@ -35,10 +35,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="10dp"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_semi_bold"
                 android:text="@string/time"
                 android:textColor="@color/dark_grey"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -52,12 +52,12 @@
                 android:id="@+id/tv_aspect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginStart="10dp"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_semi_bold"
                 android:text="@string/time"
+                android:layout_marginTop="5dp"
                 android:textColor="@color/dark_grey"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -81,10 +81,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="10dp"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_semi_bold"
                 android:text="@string/time"
                 android:textColor="@color/dark_grey"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

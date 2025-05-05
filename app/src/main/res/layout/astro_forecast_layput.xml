@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="25dp"
         android:layout_marginTop="40dp"
+        android:layout_marginBottom="50dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -86,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginVertical="10dp"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/poppins_regular"
             android:text="@string/natal_wheel_chart"
             android:textColor="@color/grey"
@@ -96,11 +97,18 @@
             android:id="@+id/iv_natal_wheel_chart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:scaleType="center"
             android:background="@android:color/transparent">
 
         </ImageView>
 
-
+        <View
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/weather_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
     </LinearLayout>
 
 </ScrollView>

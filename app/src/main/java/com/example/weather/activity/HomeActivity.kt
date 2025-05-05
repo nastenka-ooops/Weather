@@ -64,6 +64,12 @@ class HomeActivity : ComponentActivity() {
             startActivity(intent)
         }
 
+        binding.btnAstrology.setOnClickListener{
+            val intent = Intent(this, AstroForecastActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         if (selectedLocation != null) {
             showSelectedLocation(selectedLocation)
         } else {
