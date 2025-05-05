@@ -40,7 +40,7 @@ class SettingsActivity : ComponentActivity() {
         adapter = SavedLocationsAdapter(
             onLocationClick = { location ->
                 // Переход к просмотру погоды
-                val intent = Intent(this, LocationWeatherActivityWithoutList::class.java)
+                val intent = Intent(this, LocationWeatherActivity::class.java)
                 intent.putExtra("location", location)
                 startActivity(intent)
             },

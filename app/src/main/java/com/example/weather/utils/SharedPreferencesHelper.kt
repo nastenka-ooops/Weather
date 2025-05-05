@@ -30,6 +30,18 @@ class SharedPreferencesHelper(context: Context) {
         }
     }
 
+
+    fun isSavedLockation(location: LocationResponse): Boolean {
+        val savedLocations = getSavedLocations().toMutableList();
+        if(savedLocations.any {it.name == location.name})
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
+
     fun clearSelectedLocation() {
         sharedPreferences.edit().remove(SELECTED_LOCATION_KEY).apply()
     }
@@ -44,6 +56,8 @@ class SharedPreferencesHelper(context: Context) {
             val json = gson.toJson(savedLocations)
             sharedPreferences.edit().putString(LOCATIONS_KEY, json).apply()
         }
+        if(savedLocations.size == 1)
+            saveSelectedLocation(location);
     }
 
     fun getSavedLocations(): List<LocationResponse> {

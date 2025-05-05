@@ -30,7 +30,6 @@
         </activity>
         <activity android:name="com.example.weather.activity.SearchActivity" />
         <activity android:name="com.example.weather.activity.LocationWeatherActivity" />
-        <activity android:name="com.example.weather.activity.LocationWeatherActivityWithoutList" />
         <activity
             android:name="com.example.weather.activity.SettingsActivity"
             android:exported="false"

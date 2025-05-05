@@ -30,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="@drawable/button_add_to_list_bg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -42,39 +43,42 @@
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_back" />
 
-
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
             <LinearLayout
                 android:id="@+id/ll_add_to_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/custom_selectable_item_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
 
                 <TextView
                     android:id="@+id/tv_add_to_list"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:backgroundTint="@color/white"
-                    android:drawablePadding="5dp"
-                    android:elevation="0dp"
-                    android:gravity="center|end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
                     android:text="@string/add_to_list"
                     android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     app:fontFamily="@font/poppins_regular" />
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/btn_add"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@android:color/transparent"
                     android:paddingHorizontal="5dp"
-                    android:src="@drawable/ic_add_location"
-                    android:visibility="visible" />
-
+                    android:src="@drawable/ic_add_location" />
             </LinearLayout>
         </LinearLayout>
 

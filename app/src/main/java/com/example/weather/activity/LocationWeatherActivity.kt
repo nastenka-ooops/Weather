@@ -3,8 +3,10 @@ package com.example.weather.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.content.res.ColorStateList
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weather.adapter.DailyWeatherAdapter
@@ -18,6 +20,7 @@ import com.example.weather.utils.WeatherUtils
 import com.example.whether.databinding.LocationWeatherLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.example.whether.R
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -38,22 +41,67 @@ class LocationWeatherActivity : ComponentActivity() {
         sharedPreferencesHelper = SharedPreferencesHelper(this)
 
         location = (intent.getSerializableExtra("location") as? LocationResponse)!!
-
+        updateAddButtonState()
         binding.weatherLayout.tvCityName.text = location.name
         fetchWeatherData(location.latitude, location.longitude)
 
         binding.btnBack.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this, SearchActivity::class.java)
+//            startActivity(intent)
             finish()
         }
 
-        binding.btnAdd.setOnClickListener {
-            sharedPreferencesHelper.saveLocation(location)
-            Toast.makeText(this, "Location added to your list", Toast.LENGTH_SHORT).show()
+        binding.llAddToList.setOnClickListener{
+        //binding.btnAdd.setOnClickListener {
+            val isCurrentlySaved = sharedPreferencesHelper.isSavedLockation(location)
+            if(sharedPreferencesHelper.isSavedLockation(location))
+            {
+                // Если город уже в списке - удаляем его
+                sharedPreferencesHelper.removeLocation(location)
+                Toast.makeText(this, "Location removed from your list", Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                // Если города нет в списке - добавляем
+                sharedPreferencesHelper.saveLocation(location)
+                Toast.makeText(this, "Location added to your list", Toast.LENGTH_SHORT).show()
+            }
+            // Анимированное переключение состояний
+            updateAddButtonState()
+            binding.btnAdd.animate()
+                .scaleX(0.8f)
+                .scaleY(0.8f)
+                .setDuration(100)
+                .withEndAction {
+                    binding.btnAdd.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(100)
+                        .start()
+                }
+                .start()
+            //sharedPreferencesHelper.saveLocation(location)
+            //Toast.makeText(this, "Location added to your list", Toast.LENGTH_SHORT).show()
         }
+
+        updateAddButtonState()
+
     }
 
+
+    private fun updateAddButtonState() {
+        if (sharedPreferencesHelper.isSavedLockation(location)) {
+            binding.btnAdd.setImageResource(R.drawable.ic_check)
+            binding.tvAddToList.text = getString(R.string.added_to_list)
+            binding.tvAddToList.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.llAddToList.setBackgroundResource(R.drawable.green_rounded_button)
+        } else {
+            binding.btnAdd.setImageResource(R.drawable.ic_add_location)
+            binding.tvAddToList.text = getString(R.string.add_to_list)
+            binding.tvAddToList.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.llAddToList.setBackgroundResource(R.drawable.button_add_to_list_bg)
+        }
+    }
     private fun fetchWeatherData(lat: Double, lon: Double) {
         lifecycleScope.launch {
             try {
