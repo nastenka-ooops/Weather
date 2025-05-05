@@ -1,5 +1,6 @@
 package com.example.weather.activity
 
+import ChosenUnits
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -32,14 +33,14 @@ class LocationWeatherActivity : ComponentActivity() {
     private var weatherUtils: WeatherUtils = WeatherUtils()
     private lateinit var location: LocationResponse
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
-
+    private lateinit var chosenUnits: ChosenUnits
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = LocationWeatherLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-
+        chosenUnits = ChosenUnits(this)
         location = (intent.getSerializableExtra("location") as? LocationResponse)!!
         updateAddButtonState()
         binding.weatherLayout.tvCityName.text = location.name
@@ -112,7 +113,12 @@ class LocationWeatherActivity : ComponentActivity() {
                         .build()
 
                     val service = retrofit.create(OpenMeteoApi::class.java)
-                    service.getCurrentWeather(lat, lon)
+                    service.getCurrentWeather(
+                        lat= lat,
+                        lon = lon,
+                        windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
+                        temperatureUnit = chosenUnits.getApiTemperatureUnit()
+                    )
                 }
 
                 updateUI(weatherData)

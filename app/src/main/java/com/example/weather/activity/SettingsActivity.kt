@@ -1,22 +1,20 @@
 package com.example.weather.activity
 
+import ChosenUnits
 import LocationUtils
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import android.view.View
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weather.adapter.SavedLocationsAdapter
-import com.example.weather.api.OpenMeteoApi
 import com.example.weather.dto.LocationResponse
-import com.example.weather.model.Location
 import com.example.weather.utils.SharedPreferencesHelper
+import com.example.whether.R
 import com.example.whether.databinding.SettingsLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SettingsActivity : ComponentActivity() {
     private lateinit var binding: SettingsLayoutBinding
@@ -24,6 +22,7 @@ class SettingsActivity : ComponentActivity() {
     private lateinit var locationUtils: LocationUtils
     private lateinit var currLocation:LocationResponse
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+    private lateinit var chosenUnits: ChosenUnits
     private var selectedLocation: LocationResponse? = null
 
 
@@ -33,6 +32,7 @@ class SettingsActivity : ComponentActivity() {
         setContentView(binding.root)
         locationUtils = LocationUtils(this)
         sharedPreferencesHelper = SharedPreferencesHelper(this)
+        chosenUnits = ChosenUnits(this)
 
         setupRecyclerView()
         loadSavedLocations()
@@ -48,11 +48,72 @@ class SettingsActivity : ComponentActivity() {
 
         selectedLocation = sharedPreferencesHelper.getSelectedLocation()
         loadSavedLocations()
+
+        val choiceGroup1: RadioGroup = findViewById(R.id.choiceGroup1)
+        val choiceGroup2: RadioGroup = findViewById(R.id.choiceGroup2)
+        val choiceGroup3: RadioGroup = findViewById(R.id.choiceGroup3)
+
+        restoreRadioGroupSelections(choiceGroup1, choiceGroup2, choiceGroup3)
+
+        // Установка слушателей изменений
+        choiceGroup1.setOnCheckedChangeListener { _, checkedId ->
+            findViewById<RadioButton>(checkedId)?.text?.toString()?.let {
+                chosenUnits.temperatureUnit = it
+            }
+        }
+
+        choiceGroup2.setOnCheckedChangeListener { _, checkedId ->
+            findViewById<RadioButton>(checkedId)?.text?.toString()?.let {
+                chosenUnits.windSpeedUnit = it
+            }
+        }
+
+        choiceGroup3.setOnCheckedChangeListener { _, checkedId ->
+            findViewById<RadioButton>(checkedId)?.text?.toString()?.let {
+                chosenUnits.pressureUnit = it
+            }
+        }
+
     }
 
 
+    private fun restoreRadioGroupSelections(
+        group1: RadioGroup,
+        group2: RadioGroup,
+        group3: RadioGroup
+    ) {
+        // Для Temperature
+        selectRadioButtonByText(group1, chosenUnits.temperatureUnit)
 
+        // Для Wind speed
+        selectRadioButtonByText(group2, chosenUnits.windSpeedUnit)
 
+        // Для Pressure
+        selectRadioButtonByText(group3, chosenUnits.pressureUnit)
+    }
+    private fun selectRadioButtonByText(radioGroup: RadioGroup, text: String) {
+        for (i in 0 until radioGroup.childCount) {
+            val radioButton = radioGroup.getChildAt(i) as RadioButton
+            if (radioButton.text.toString() == text) {
+                radioButton.isChecked = true
+                break
+            }
+        }
+    }
+
+    private fun resetToDefaultSettings(
+        group1: RadioGroup,
+        group2: RadioGroup,
+        group3: RadioGroup
+    ) {
+        // Сброс значений
+        chosenUnits.temperatureUnit = "°C"
+        chosenUnits.windSpeedUnit = "m/s"
+        chosenUnits.pressureUnit = "mmHg"
+
+        // Обновление UI
+        restoreRadioGroupSelections(group1, group2, group3)
+    }
 
     private fun setupRecyclerView() {
         adapter = SavedLocationsAdapter(

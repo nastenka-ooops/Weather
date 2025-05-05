@@ -1,5 +1,6 @@
 package com.example.weather.activity
 
+import ChosenUnits
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -22,6 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class SearchActivity : ComponentActivity() {
     private lateinit var binding: SearchLayoutBinding
     private lateinit var adapter: SearchLocationsAdapter
+    private lateinit var chosenUnits: ChosenUnits
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +31,7 @@ class SearchActivity : ComponentActivity() {
         setContentView(binding.root)
 
         binding.etSearchLocation.requestFocus()
-
+        chosenUnits = ChosenUnits(this)
         adapter = SearchLocationsAdapter { selectedLocation ->
             val intent = Intent(this, LocationWeatherActivity::class.java)
             intent.putExtra("location", selectedLocation)
@@ -85,7 +87,11 @@ class SearchActivity : ComponentActivity() {
                                         .build()
 
                                     val service = retrofit.create(OpenMeteoApi::class.java)
-                                    service.getCurrentWeather(location.latitude, location.longitude)
+                                    service.getCurrentWeather(
+                                        location.latitude,
+                                        location.longitude,
+                                        windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
+                                        temperatureUnit = chosenUnits.getApiTemperatureUnit())
                                 }
                                 location.apply {
                                     temperature = weatherData.current_weather.temperature
