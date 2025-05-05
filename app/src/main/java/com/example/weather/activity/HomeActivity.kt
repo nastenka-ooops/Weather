@@ -1,5 +1,6 @@
 package com.example.weather.activity
 
+import ChosenUnits
 import LocationUtils
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -29,6 +30,7 @@ class HomeActivity : ComponentActivity() {
     private lateinit var dailyAdapter: DailyWeatherAdapter
     private lateinit var locationUtils: LocationUtils
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+    private lateinit var chosenUnits: ChosenUnits
     private var weatherUtils: WeatherUtils = WeatherUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +41,7 @@ class HomeActivity : ComponentActivity() {
 
 
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-
+        chosenUnits = ChosenUnits(this)
         locationUtils = LocationUtils(this)
         val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
         if(sharedPreferencesHelper.getFlag()) {
@@ -114,13 +116,37 @@ class HomeActivity : ComponentActivity() {
                         .build()
 
                     val service = retrofit.create(OpenMeteoApi::class.java)
-                    service.getCurrentWeather(lat, lon)
+                    service.getCurrentWeather(
+                        lat= lat,
+                        lon = lon,
+                        windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
+                        temperatureUnit = chosenUnits.getApiTemperatureUnit()
+                    )
+
                 }
 
                 updateUI(weatherData)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+
+    private fun getApiTemperatureUnit(prefUnit: String): String {
+        return when (prefUnit) {
+            "°C" -> "celsius"
+            "°F" -> "fahrenheit"
+            else -> "celsius"
+        }
+    }
+
+    private fun getApiWindSpeedUnit(prefUnit: String): String {
+        return when (prefUnit) {
+            "m/s" -> "ms"
+            "km/h" -> "kmh"
+            "mph" -> "mph"
+            "knots" -> "kn"
+            else -> "ms"
         }
     }
 
@@ -220,5 +246,63 @@ class HomeActivity : ComponentActivity() {
         if (remainingMins < 0) remainingMins = 0
 
         return "${remainingHours}H ${remainingMins}M"
+    }
+
+
+    private fun loadWeatherData() {
+        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
+
+        if (selectedLocation != null) {
+            // Пытаемся загрузить сохраненные данные
+            val cachedData = sharedPreferencesHelper.getWeatherData(selectedLocation)
+
+            if (cachedData != null) {
+                // Показываем сохраненные данные
+                updateUI(cachedData)
+            } else {
+                // Загружаем свежие данные с API
+                fetchFreshData(selectedLocation)
+            }
+        } else {
+            // Используем текущее местоположение
+            locationUtils.getCurrentLocation(
+                onSuccess = { lat, lon ->
+                    val cityName = locationUtils.getCityName(lat, lon)
+                    binding.weatherLayout.tvCityName.text = cityName
+                    fetchWeatherData(lat, lon)
+                }
+            )
+        }
+    }
+
+    private fun fetchFreshData(location: LocationResponse) {
+        lifecycleScope.launch {
+            try {
+
+                val weatherData = withContext(Dispatchers.IO) {
+                    val retrofit = Retrofit.Builder()
+                        .baseUrl("https://api.open-meteo.com/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+
+                    val service = retrofit.create(OpenMeteoApi::class.java)
+                    service.getCurrentWeather(
+                        lat= location.latitude,
+                        lon = location.longitude,
+                        windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
+                        temperatureUnit = chosenUnits.getApiTemperatureUnit()
+                    )
+
+                }
+                // Сохраняем новые данные
+                sharedPreferencesHelper.saveWeatherData(location, weatherData, null)
+
+                // Обновляем UI
+                updateUI(weatherData)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Обработка ошибки
+            }
+        }
     }
 }

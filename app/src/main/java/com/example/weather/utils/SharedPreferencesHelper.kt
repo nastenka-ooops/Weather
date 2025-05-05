@@ -1,8 +1,11 @@
 package com.example.weather.utils
 
+import LocationWeatherData
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.weather.dto.AirQualityResponse
 import com.example.weather.dto.LocationResponse
+import com.example.weather.dto.WeatherResponse
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -12,7 +15,9 @@ class SharedPreferencesHelper(context: Context) {
     private val gson = Gson()
     private val LOCATIONS_KEY = "saved_locations"
     private val SELECTED_LOCATION_KEY = "selected_location"
+    private val WEATHER_DATA_KEY = "weather_data_"
     private val sharedflag = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+    private val CACHE_DURATION = 2 * 60 * 60 * 1000
 
     fun saveSelectedLocation(location: LocationResponse) {
         val json = gson.toJson(location)
@@ -31,7 +36,29 @@ class SharedPreferencesHelper(context: Context) {
         }
     }
 
+    fun saveWeatherData(location: LocationResponse, weather: WeatherResponse, airQuality: AirQualityResponse?) {
+        val data = mapOf(
+            "weather" to gson.toJson(weather),
+            "lastUpdated" to System.currentTimeMillis()
+        )
+        val json = gson.toJson(data)
+        sharedPreferences.edit()
+            .putString("$WEATHER_DATA_KEY${location.name}", json)
+            .apply()
+    }
 
+    // Получаем сохраненные погодные данные для локации
+    fun getWeatherData(location: LocationResponse): WeatherResponse? {
+        val json = sharedPreferences.getString("$WEATHER_DATA_KEY${location.name}", null) ?: return null
+        val data = gson.fromJson(json, object : TypeToken<Map<String, Any>>() {}.type) as? Map<String, Any>
+
+        // Проверяем, не устарели ли данные
+        val lastUpdated = data?.get("lastUpdated") as? Long ?: return null
+        if (System.currentTimeMillis() - lastUpdated > CACHE_DURATION) return null
+
+        val weatherJson = data["weather"] as? String ?: return null
+        return gson.fromJson(weatherJson, WeatherResponse::class.java)
+    }
     fun isSavedLockation(location: LocationResponse): Boolean {
         val savedLocations = getSavedLocations().toMutableList();
         if(savedLocations.any {it.name == location.name})
@@ -82,6 +109,16 @@ class SharedPreferencesHelper(context: Context) {
         savedLocations.removeAll { it.name == location.name }
         val json = gson.toJson(savedLocations)
         sharedPreferences.edit().putString(LOCATIONS_KEY, json).apply()
+
+
+        sharedPreferences.edit()
+            .remove("$WEATHER_DATA_KEY${location.name}")
+            .apply()
+
+        // Если удаляемая локация была выбранной, сбрасываем выбор
+        if (getSelectedLocation()?.name == location.name) {
+            clearSelectedLocation()
+        }
     }
 
     fun setFlag(value: Boolean) {

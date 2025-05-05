@@ -18,7 +18,8 @@ interface OpenMeteoApi {
         @Query("daily") daily: String = "sunrise,sunset,uv_index_max,precipitation_probability_mean," +
                 "daylight_duration,temperature_2m_max,temperature_2m_min,weather_code",
         @Query("timezone") timezone: String = "auto",
-        @Query("wind_speed_unit") windSpeedUnit: String = "ms"
+        @Query("wind_speed_unit") windSpeedUnit: String,
+        @Query("temperature_unit") temperatureUnit: String
     ): WeatherResponse
 
     @GET("v1/air-quality")
