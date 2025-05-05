@@ -182,6 +182,20 @@
         </LinearLayout>
     </LinearLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/weatherDetailsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:clipToPadding="false"
+            android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ll_whether_info"/>
+
+
     <TextView
         android:id="@+id/tv_hourly_forecast"
         android:layout_width="wrap_content"
@@ -194,7 +208,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll_whether_info" />
+        app:layout_constraintTop_toBottomOf="@+id/weatherDetailsRecyclerView" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_hourly_forecast"
