@@ -80,4 +80,6 @@ dependencies {
     implementation (libs.play.services.location)
     implementation( libs.androidx.cardview)
     implementation(libs.androidx.recyclerview)
+    implementation (libs.androidsvg)
+
 }

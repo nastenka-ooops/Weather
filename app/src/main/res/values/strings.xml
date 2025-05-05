@@ -26,5 +26,8 @@
     <string name="use_current_location">Use current location</string>
     <string name="set_as_default">Set as default</string>
     <string name="location_set_as_default">%s установлен как основной</string>
-    <color name="light_green">#E8F5E9</color>
+    <string name="planets">PLANETS</string>
+    <string name="aspects">ASPECTS</string>
+    <string name="natal_wheel_chart">NATAL WHEEL CHART</string>
+    <string name="astro_forecast">Astro Forecast</string>
 </resources>
