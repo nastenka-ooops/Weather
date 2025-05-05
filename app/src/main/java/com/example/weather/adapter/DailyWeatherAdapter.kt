@@ -17,6 +17,7 @@ class DailyWeatherAdapter: RecyclerView.Adapter<DailyWeatherAdapter.WeatherHolde
         private val binding = DailyWeatherItemLayoutBinding.bind(view)
         private var weatherUtils: WeatherUtils = WeatherUtils()
 
+
         @SuppressLint("SetTextI18n")
         fun bind(dayliWeather: DailyWeatherItem) = with(binding) {
 

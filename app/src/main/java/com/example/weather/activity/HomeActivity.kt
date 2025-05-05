@@ -33,19 +33,24 @@ class HomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = HomeLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        sharedPreferencesHelper = SharedPreferencesHelper(this)
-        locationUtils = LocationUtils(this)
-        locationUtils.getCurrentLocation(
-            onSuccess = { lat, lon ->
-                val cityName = locationUtils.getCityName(lat, lon)
-                binding.weatherLayout.tvCityName.text = cityName
-                fetchWeatherData(lat, lon)
-            }
-        )
 
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
+
+        locationUtils = LocationUtils(this)
+        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
+        if(sharedPreferencesHelper.getFlag()) {
+            locationUtils.getCurrentLocation(
+                onSuccess = { lat, lon ->
+                    val cityName = locationUtils.getCityName(lat, lon)
+                    binding.weatherLayout.tvCityName.text = cityName
+                    fetchWeatherData(lat, lon)
+                }
+            )
+        }
         binding.etSearchLocation.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
@@ -56,7 +61,6 @@ class HomeActivity : ComponentActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
-        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
 
         if (selectedLocation != null) {
             showSelectedLocation(selectedLocation)
@@ -72,9 +76,20 @@ class HomeActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
-        selectedLocation?.let {
-            showSelectedLocation(it)
+        if(!sharedPreferencesHelper.getFlag()) {
+            val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
+            selectedLocation?.let {
+                showSelectedLocation(it)
+            }
+        }
+        else{
+            locationUtils.getCurrentLocation(
+                onSuccess = { lat, lon ->
+                    val cityName = locationUtils.getCityName(lat, lon)
+                    binding.weatherLayout.tvCityName.text = cityName
+                    fetchWeatherData(lat, lon)
+                }
+            )
         }
     }
 

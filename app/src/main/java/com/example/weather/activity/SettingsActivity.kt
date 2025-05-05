@@ -1,5 +1,6 @@
 package com.example.weather.activity
 
+import LocationUtils
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -7,13 +8,21 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weather.adapter.SavedLocationsAdapter
+import com.example.weather.api.OpenMeteoApi
 import com.example.weather.dto.LocationResponse
+import com.example.weather.model.Location
 import com.example.weather.utils.SharedPreferencesHelper
 import com.example.whether.databinding.SettingsLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class SettingsActivity : ComponentActivity() {
     private lateinit var binding: SettingsLayoutBinding
     private lateinit var adapter: SavedLocationsAdapter
+    private lateinit var locationUtils: LocationUtils
+    private lateinit var currLocation:LocationResponse
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
     private var selectedLocation: LocationResponse? = null
 
@@ -22,12 +31,17 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = SettingsLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        locationUtils = LocationUtils(this)
         sharedPreferencesHelper = SharedPreferencesHelper(this)
 
         setupRecyclerView()
         loadSavedLocations()
-
+        binding.btnResetDefault.setOnClickListener {
+            sharedPreferencesHelper.clearSelectedLocation();
+            sharedPreferencesHelper.setSelectedNull();
+            loadSavedLocations()
+            Toast.makeText(this, "Home weather changed to current place", Toast.LENGTH_SHORT).show()
+        }
         binding.btnBack.setOnClickListener {
             finish()
         }
@@ -36,11 +50,15 @@ class SettingsActivity : ComponentActivity() {
         loadSavedLocations()
     }
 
+
+
+
+
     private fun setupRecyclerView() {
         adapter = SavedLocationsAdapter(
             onLocationClick = { location ->
                 // Переход к просмотру погоды
-                val intent = Intent(this, LocationWeatherActivityWithoutList::class.java)
+                val intent = Intent(this, LocationWeatherActivity::class.java)
                 intent.putExtra("location", location)
                 startActivity(intent)
             },

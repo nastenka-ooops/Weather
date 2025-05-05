@@ -12,11 +12,12 @@ class SharedPreferencesHelper(context: Context) {
     private val gson = Gson()
     private val LOCATIONS_KEY = "saved_locations"
     private val SELECTED_LOCATION_KEY = "selected_location"
-
+    private val sharedflag = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
 
     fun saveSelectedLocation(location: LocationResponse) {
         val json = gson.toJson(location)
         sharedPreferences.edit().putString(SELECTED_LOCATION_KEY, json).apply()
+        setFlag(false);
     }
 
 
@@ -30,10 +31,27 @@ class SharedPreferencesHelper(context: Context) {
         }
     }
 
-    fun clearSelectedLocation() {
-        sharedPreferences.edit().remove(SELECTED_LOCATION_KEY).apply()
+
+    fun isSavedLockation(location: LocationResponse): Boolean {
+        val savedLocations = getSavedLocations().toMutableList();
+        if(savedLocations.any {it.name == location.name})
+        {
+            return true;
+        }
+        else
+            return false;
     }
 
+
+    fun clearSelectedLocation() {
+        sharedPreferences.edit().remove(SELECTED_LOCATION_KEY).apply()
+
+        setFlag(true)
+    }
+
+    fun setSelectedNull(){
+       setFlag(true);
+    }
 
     fun saveLocation(location: LocationResponse) {
         val savedLocations = getSavedLocations().toMutableList()
@@ -43,6 +61,9 @@ class SharedPreferencesHelper(context: Context) {
             savedLocations.add(location)
             val json = gson.toJson(savedLocations)
             sharedPreferences.edit().putString(LOCATIONS_KEY, json).apply()
+        }
+        if(savedLocations.size == 1) {
+            saveSelectedLocation(location);
         }
     }
 
@@ -62,4 +83,14 @@ class SharedPreferencesHelper(context: Context) {
         val json = gson.toJson(savedLocations)
         sharedPreferences.edit().putString(LOCATIONS_KEY, json).apply()
     }
+
+    fun setFlag(value: Boolean) {
+        sharedflag.edit().putBoolean("MY_FLAG_KEY", value).apply()
+    }
+
+    fun getFlag(): Boolean {
+        return sharedflag.getBoolean("MY_FLAG_KEY", false) // false - значение по умолчанию
+    }
+
+
 }
