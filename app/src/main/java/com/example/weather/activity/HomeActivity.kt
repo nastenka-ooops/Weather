@@ -42,7 +42,7 @@ class HomeActivity : ComponentActivity() {
 
         locationUtils = LocationUtils(this)
         val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
-        if(selectedLocation == null) {
+        if(sharedPreferencesHelper.getFlag()) {
             locationUtils.getCurrentLocation(
                 onSuccess = { lat, lon ->
                     val cityName = locationUtils.getCityName(lat, lon)
@@ -76,9 +76,20 @@ class HomeActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
-        selectedLocation?.let {
-            showSelectedLocation(it)
+        if(!sharedPreferencesHelper.getFlag()) {
+            val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
+            selectedLocation?.let {
+                showSelectedLocation(it)
+            }
+        }
+        else{
+            locationUtils.getCurrentLocation(
+                onSuccess = { lat, lon ->
+                    val cityName = locationUtils.getCityName(lat, lon)
+                    binding.weatherLayout.tvCityName.text = cityName
+                    fetchWeatherData(lat, lon)
+                }
+            )
         }
     }
 
