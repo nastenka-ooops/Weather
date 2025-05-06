@@ -31,7 +31,7 @@ class HomeActivity : ComponentActivity() {
     private lateinit var hourlyAdapter: HourlyWeatherAdapter
     private lateinit var dailyAdapter: DailyWeatherAdapter
     private lateinit var locationUtils: LocationUtils
-    private var weatherUtils: WeatherUtils = WeatherUtils()
+    private  var weatherUtils: WeatherUtils = WeatherUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +87,7 @@ class HomeActivity : ComponentActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateUI(weatherData: WeatherResponse, airQualityData: AirQualityResponse) {
         val currentTime: String
+        val sunset: String
         binding.weatherLayout.apply {
             val isDay = weatherData.current_weather.is_day == 1
 
@@ -109,7 +110,7 @@ class HomeActivity : ComponentActivity() {
             tvWind.text = weatherData.current_weather.windspeed.toString()
 
             tvSunrise.text = weatherData.daily.sunrise[0].substring(11, 16)
-            val sunset = weatherData.daily.sunset[0].substring(11, 16);
+            sunset = weatherData.daily.sunset[0].substring(11, 16);
             tvSunset.text = sunset
 
             val daylight = weatherData.daily.daylight_duration[0]
@@ -119,6 +120,14 @@ class HomeActivity : ComponentActivity() {
 
             val remainingDaylight = calculateRemainingDaylight(sunset, currentTime)
             tvRemainingDaylight.text = remainingDaylight
+
+            tvLengthOfDay.text = "${daylightHours}H ${daylightMinutes}M"
+            tvRemDaylight.text = remainingDaylight
+
+            val sunriseTime = weatherData.daily.sunrise[0].substring(11, 16)
+            val sunsetTime = weatherData.daily.sunset[0].substring(11, 16)
+            binding.weatherLayout.sunPositionView.updateTime(sunriseTime, sunsetTime, LocalTime.now())
+
         }
 
         hourlyAdapter = HourlyWeatherAdapter()
@@ -208,12 +217,11 @@ class HomeActivity : ComponentActivity() {
         )
         recyclerView.adapter = WeatherDetailAdapter(weatherDetails)
 
-        val sunPositionView = SunPositionView(this)
-        binding.weatherLayout.sunPositionContainer.addView(sunPositionView)
 
+        val daylight = weatherData.daily.daylight_duration[0]
+        val daylightHours = (daylight / 3600).toInt()
+        val daylightMinutes = ((daylight - daylightHours * 3600) / 60).toInt()
 
-
-        sunPositionView.updateTime(weatherData.daily.sunrise[0], weatherData.daily.sunset[0], LocalTime.now().toString() )
 
 
     }

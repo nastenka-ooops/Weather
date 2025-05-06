@@ -20,6 +20,7 @@ import com.example.whether.databinding.LocationWeatherLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.threeten.bp.LocalTime
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -111,6 +112,14 @@ class LocationWeatherActivity : ComponentActivity() {
 
             val remainingDaylight = calculateRemainingDaylight(sunset, currentTime)
             tvRemainingDaylight.text = remainingDaylight
+
+            tvLengthOfDay.text = "${daylightHours}H ${daylightMinutes}M"
+            tvRemDaylight.text = remainingDaylight
+
+            val sunriseTime = weatherData.daily.sunrise[0].substring(11, 16)
+            val sunsetTime = weatherData.daily.sunset[0].substring(11, 16)
+            binding.weatherLayout.sunPositionView.updateTime(sunriseTime, sunsetTime, LocalTime.now())
+
         }
         hourlyAdapter = HourlyWeatherAdapter()
 

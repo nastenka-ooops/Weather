@@ -6,10 +6,8 @@ import android.util.AttributeSet
 import android.view.View
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalTime
-import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import kotlin.math.min
-import kotlin.math.pow
 
 class SunPositionView @JvmOverloads constructor(
     context: Context,
@@ -18,12 +16,12 @@ class SunPositionView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     // Paints
-    private val skyPaint = Paint().apply {
+    private val skyPaintDay = Paint().apply {
         style = Paint.Style.FILL
         color = Color.parseColor("#8AD4FF")
     }
 
-    private val nightPaint = Paint().apply {
+    private val skyPaintNight = Paint().apply {
         style = Paint.Style.FILL
         color = Color.parseColor("#001862")
     }
@@ -31,6 +29,10 @@ class SunPositionView @JvmOverloads constructor(
     private val sunPaint = Paint().apply {
         style = Paint.Style.FILL
         color = Color.parseColor("#FFD700")
+    }
+    private val moonPaint = Paint().apply {
+        style = Paint.Style.FILL
+        color = Color.parseColor("#D3D3D3")
     }
 
     private val linePaint = Paint().apply {
@@ -56,9 +58,9 @@ class SunPositionView @JvmOverloads constructor(
     }
 
     // Values
-    private var sunriseTime: LocalTime = LocalTime.of(12, 0)
-    private var sunsetTime: LocalTime = LocalTime.of(20, 0)
-    private var nowTime: LocalTime = LocalTime.of(13, 0)
+    private var sunriseTime: LocalTime = LocalTime.of(6, 7)
+    private var sunsetTime: LocalTime = LocalTime.of(12, 2)
+    private var nowTime: LocalTime = LocalTime.of(20, 0)
 
     private var currentSunPosition: Float = 0f
     private var lengthOfDay: String = ""
@@ -68,24 +70,23 @@ class SunPositionView @JvmOverloads constructor(
 
     private val formatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    fun updateTime(sunrise: String, sunset: String, now: String) {
-        try {
-            sunriseTime = LocalTime.parse(sunrise, formatter)
-            sunsetTime = LocalTime.parse(sunset, formatter)
-            nowTime = LocalTime.parse(now, formatter)
+    fun updateTime(sunrise: String, sunset: String, now: LocalTime) {
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        sunriseTime = LocalTime.parse(sunrise, formatter)
+        sunsetTime = LocalTime.parse(sunset, formatter)
 
-            val totalDuration = Duration.between(sunriseTime, sunsetTime).toMinutes().coerceAtLeast(1)
-            val passed = Duration.between(sunriseTime, nowTime).toMinutes().coerceIn(0, totalDuration)
-
-            currentSunPosition = passed.toFloat() / totalDuration
-            lengthOfDay = formatDuration(totalDuration)
-            remainingDaylight = formatDuration((totalDuration - passed).coerceAtLeast(0))
-
-            invalidate()
-        } catch (e: Exception) {
-            // Handle invalid time format
+        // Проверка: день или ночь
+        if (now.isBefore(sunriseTime) || now.isAfter(sunsetTime)) {
+            currentSunPosition = -1f // сигнализируем, что солнце не видно
+        } else {
+            val totalDuration = Duration.between(sunriseTime, sunsetTime).toMinutes().toFloat()
+            val elapsed = Duration.between(sunriseTime, now).toMinutes().toFloat()
+            currentSunPosition = elapsed / totalDuration
         }
+
+        invalidate()
     }
+
 
     private fun formatDuration(minutes: Long): String {
         val hours = minutes / 60
@@ -98,81 +99,148 @@ class SunPositionView @JvmOverloads constructor(
 
         val width = width.toFloat()
         val height = height.toFloat()
+        val horizonHeight = height * 0.5f
 
-        val padding = width * 0.08f
-        val horizonHeight = height * 0.7f
+        val sunriseMinute = sunriseTime.hour * 60f + sunriseTime.minute
+        val sunsetMinute = sunsetTime.hour * 60f + sunsetTime.minute
+        val nowMinute = nowTime.hour * 60f + nowTime.minute
+        val totalDuration = sunsetMinute - sunriseMinute
 
-        val sunriseHour = sunriseTime.hour + sunriseTime.minute / 60f
-        val sunsetHour = sunsetTime.hour + sunsetTime.minute / 60f
-        val nowHour = nowTime.hour + nowTime.minute / 60f
+        // Горизонт
+        canvas.drawLine(0f, horizonHeight, width, horizonHeight, linePaint)
 
-        val totalDuration = sunsetHour - sunriseHour
+        // Отступы
+        val paddingLeft = width / 1440f * sunriseMinute
+        val paddingRight = width - width / 1440f * sunsetMinute
 
-        // Horizon line
-        canvas.drawLine(padding, horizonHeight, width - padding, horizonHeight, linePaint)
-        canvas.drawText("Horizon", width - padding - 60f, horizonHeight + 30f, textPaint)
+        // Ночная зона слева (парабола под горизонтом)
+        val nightLeftH = sunriseMinute / 2f
+        val nightLeftMaxHeight = (height * 0.5f) / 1440f * sunriseMinute
 
+        val nightLeftY = { x: Float ->
+            val normalizedX = (x - nightLeftH) / (sunriseMinute / 2f)
+            horizonHeight + (-nightLeftMaxHeight * normalizedX * normalizedX + nightLeftMaxHeight)
+        }
 
-        // Night (left & right)
-        val nightPath = Path()
-        nightPath.moveTo(0f, height * 0.7f)
-        nightPath.lineTo(padding, height * 0.7f)
-        nightPath.lineTo(padding, 0f)
-        nightPath.lineTo(0f, 0f)
-        nightPath.close()
-        canvas.drawPath(nightPath, nightPaint)
+        val nightLeftX = { x: Float ->
+            x / sunriseMinute * paddingLeft
+        }
 
-        val nightPath2 = Path()
-        nightPath2.moveTo(width - padding, height * 0.7f)
-        nightPath2.lineTo(width, height * 0.7f)
-        nightPath2.lineTo(width, 0f)
-        nightPath2.lineTo(width - padding, 0f)
-        nightPath2.close()
-        canvas.drawPath(nightPath2, nightPaint)
+        val nightPathLeft = Path().apply {
+            moveTo(nightLeftX(0f), nightLeftY(0f))
+            val step = 1f
+            var x = 0f
+            while (x <= sunriseMinute) {
+                lineTo(nightLeftX(x), nightLeftY(x))
+                x += step
+            }
 
-        // Sun position (parabola)
-        val a = -1f / (totalDuration / 2f).pow(2) // Параметр для параболы
-        val h = (sunriseHour + sunsetHour) / 2f // Вершина параболы — зенит
+            lineTo(nightLeftX(sunriseMinute), horizonHeight)
+            lineTo(nightLeftX(0f), horizonHeight)
+
+            close()
+        }
+        canvas.drawPath(nightPathLeft, skyPaintNight)
+
+        // Ночная зона справа (парабола под горизонтом)
+        val nightRightH = (sunsetMinute + 1440f) / 2f
+        val nightRightMaxHeight = (height * 0.5f) / 1440f * (1440f - sunsetMinute)
+
+        val nightRightY = { x: Float ->
+            val normalizedX = (x - nightRightH) / ((1440f - sunsetMinute) / 2f)
+            horizonHeight + (-nightRightMaxHeight * normalizedX * normalizedX + nightRightMaxHeight)
+        }
+
+        val nightRightX = { x: Float ->
+            val rightDuration = 1440f - sunsetMinute
+            val availableWidth = paddingRight
+            width - availableWidth + (x - sunsetMinute) / rightDuration * availableWidth
+        }
+
+        val nightPathRight = Path().apply {
+            moveTo(nightRightX(sunsetMinute), nightRightY(sunsetMinute))
+            val step = 1f
+            var x = sunsetMinute
+            while (x <= 1440f) {
+                lineTo(nightRightX(x), nightRightY(x))
+                x += step
+            }
+
+            lineTo(nightRightX(1440f), horizonHeight)
+            lineTo(nightRightX(sunsetMinute), horizonHeight)
+
+            close()
+        }
+        canvas.drawPath(nightPathRight, skyPaintNight)
+
+        // Парабола: вершина в зените
+        val h = (sunriseMinute + sunsetMinute) / 2f
+        val maxHeight = (height * 0.5f) / 1440f * (sunsetMinute - sunriseMinute)
 
         val sunY = { x: Float ->
-            val y = a * (x - h).pow(2)
-            height * 0.4f - y * (height * 0.3f) // Масштабируем по оси Y
+            val normalizedX = (x - h) / (totalDuration / 2f)
+            horizonHeight - (-maxHeight * normalizedX * normalizedX + maxHeight)
         }
 
-        val sunX = { x: Float -> padding + (x - sunriseHour) / totalDuration * (width - 2 * padding) }
-
-        // Построение параболы
-        val path = Path()
-        path.moveTo(sunX(sunriseHour), sunY(sunriseHour))
-        for (x in sunriseHour.toInt()..sunsetHour.toInt()) {
-            path.lineTo(sunX(x.toFloat()), sunY(x.toFloat()))
+        val sunX = { x: Float ->
+            val availableWidth = width - paddingLeft - paddingRight
+            paddingLeft + (x - sunriseMinute) / totalDuration * availableWidth
         }
-        canvas.drawPath(path, skyPaint)
 
-        // Отрисовка солнца
-        val sunXPosition = sunX(nowHour)
-        val sunYPosition = sunY(nowHour)
+        // Отрисовка дневной параболы
+        val path = Path().apply {
+            moveTo(sunX(sunriseMinute), sunY(sunriseMinute))
+            val step = 0.5f
+            var x = sunriseMinute + step
+            while (x <= sunsetMinute) {
+                lineTo(sunX(x), sunY(x))
+                x += step
+            }
+            lineTo(sunX(sunsetMinute), sunY(sunsetMinute))
+        }
+        canvas.drawPath(path, skyPaintDay)
+
+        // Солнце
         val sunRadius = min(width, height) * 0.03f
-        canvas.drawCircle(sunXPosition, sunYPosition, sunRadius, sunPaint)
+        val sunXPosition: Float
+        val sunYPosition: Float
+        val circlePaint: Paint
+        when {
+            nowMinute < sunriseMinute -> {
+                // Левая ночная парабола
+                sunXPosition = nightLeftX(nowMinute)
+                sunYPosition = nightLeftY(nowMinute)
+                circlePaint = moonPaint
+            }
 
-        // Sunrise & Sunset lines and labels
-        canvas.drawLine(sunX(sunriseHour), height * 0.7f, sunX(sunriseHour), height * 0.7f - height * 0.25f, linePaint)
-        canvas.drawLine(sunX(sunsetHour), height * 0.7f, sunX(sunsetHour), height * 0.7f - height * 0.25f, linePaint)
+            nowMinute in sunriseMinute..sunsetMinute -> {
+                // Дневная парабола
+                sunXPosition = sunX(nowMinute)
+                sunYPosition = sunY(nowMinute)
+                circlePaint = sunPaint
+            }
 
-        canvas.drawText("Sunrise", sunX(sunriseHour), height * 0.22f, textPaint)
-        canvas.drawText(sunriseTime.format(formatter), sunX(sunriseHour), height * 0.28f, boldTextPaint)
+            else -> {
+                // Правая ночная парабола
+                sunXPosition = nightRightX(nowMinute)
+                sunYPosition = nightRightY(nowMinute)
+                circlePaint = moonPaint
+            }
 
-        canvas.drawText("Sunset", sunX(sunsetHour), height * 0.22f, textPaint)
-        canvas.drawText(sunsetTime.format(formatter), sunX(sunsetHour), height * 0.28f, boldTextPaint)
+        }
 
-        // Info text
-        val infoY = height * 0.78f
-        val infoLabelY = height * 0.85f
+        canvas.drawCircle(sunXPosition, sunYPosition, sunRadius, circlePaint)
 
-        canvas.drawText("Length of day:", width * 0.28f, infoY, textPaint)
-        canvas.drawText(lengthOfDay, width * 0.28f, infoLabelY, boldTextPaint)
+        // Линии и подписи восхода и заката
+        canvas.drawLine(sunX(sunriseMinute), horizonHeight, sunX(sunriseMinute), horizonHeight - height * 0.25f, linePaint)
+        canvas.drawLine(sunX(sunsetMinute), horizonHeight, sunX(sunsetMinute), horizonHeight - height * 0.25f, linePaint)
 
-        canvas.drawText("Remaining daylight:", width * 0.72f, infoY, textPaint)
-        canvas.drawText(remainingDaylight, width * 0.72f, infoLabelY, boldTextPaint)
+        canvas.drawText("Sunrise", sunX(sunriseMinute), height * 0.22f, textPaint)
+        canvas.drawText(sunriseTime.format(formatter), sunX(sunriseMinute), height * 0.28f, boldTextPaint)
+
+        canvas.drawText("Sunset", sunX(sunsetMinute), height * 0.22f, textPaint)
+        canvas.drawText(sunsetTime.format(formatter), sunX(sunsetMinute), height * 0.28f, boldTextPaint)
     }
+
+
 }
