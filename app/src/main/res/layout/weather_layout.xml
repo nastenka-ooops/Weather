@@ -101,7 +101,91 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_hourly_forecast"
         />
+    <LinearLayout
+        android:id="@+id/sunCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:background="@drawable/bordered_background"
+        app:layout_constraintTop_toBottomOf="@+id/rv_hourly_forecast"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Заголовок -->
+        <TextView
+            android:id="@+id/tv_sun_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/poppins_regular"
+            android:text="@string/sunrise_amp_sunset"
+            android:textColor="@color/grey"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+        />
+
+        <!-- Контейнер для графика -->
+        <com.example.weather.view.SunPositionView
+            android:id="@+id/sunPositionView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="5dp"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Length of day:"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="13sp"/>
+
+                <TextView
+                    android:id="@+id/tvLengthOfDay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/length_of_day"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:gravity="end">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remaining daylight:"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="13sp"/>
+
+                <TextView
+                    android:id="@+id/tvRemDaylight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/daylight"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
     <TextView
         android:id="@+id/tv_daily_forecast"
         android:layout_width="wrap_content"
@@ -114,7 +198,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rv_hourly_forecast" />
+        app:layout_constraintTop_toBottomOf="@id/sunCard" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_daily_forecast"
@@ -128,90 +212,6 @@
         app:layout_constraintTop_toBottomOf="@id/tv_daily_forecast" />
 
 
-     <LinearLayout
-            android:id="@+id/sunCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:padding="16dp"
-            android:background="@drawable/bordered_background"
-            app:layout_constraintTop_toBottomOf="@+id/rv_daily_forecast"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Заголовок -->
-        <TextView
-                android:id="@+id/tv_sun_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:fontFamily="@font/poppins_regular"
-                android:text="@string/sunrise_amp_sunset"
-                android:textColor="@color/grey"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-        />
-
-        <!-- Контейнер для графика -->
-        <com.example.weather.view.SunPositionView
-                android:id="@+id/sunPositionView"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"/>
-
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="5dp"
-                android:weightSum="2">
-
-            <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_height="wrap_content">
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Length of day:"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="13sp"/>
-
-                <TextView
-                        android:id="@+id/tvLengthOfDay"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/length_of_day"
-                        android:textStyle="bold"
-                        android:textSize="14sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_height="wrap_content"
-                    android:gravity="end">
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Remaining daylight:"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="13sp"/>
-
-                <TextView
-                        android:id="@+id/tvRemDaylight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/daylight"
-                        android:textStyle="bold"
-                        android:textSize="14sp"/>
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
