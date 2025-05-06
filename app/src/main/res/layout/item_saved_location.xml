@@ -4,14 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:paddingVertical="15dp">
 
     <TextView
         android:id="@+id/tv_location_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="18sp"
+        android:fontFamily="@font/poppins_regular"
         app:layout_constraintBottom_toBottomOf="@+id/iv_weather_icon"
         app:layout_constraintEnd_toStartOf="@+id/tv_temperature"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,8 +32,8 @@
 
     <ImageButton
         android:id="@+id/iv_weather_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginEnd="8dp"
         android:background="@android:color/white"
         android:scaleType="fitCenter"
@@ -42,26 +43,29 @@
 
     <Button
         android:id="@+id/btn_set_default"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="45dp"
         android:layout_marginEnd="8dp"
         android:text="@string/set_as_default"
-        android:fontFamily="@font/poppins_regular"
+        app:fontFamily="@font/poppins_semi_bold"
         android:background="@drawable/rounded_button"
         android:textColor="@color/black"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tv_is_default"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_is_default"
-        android:layout_width="wrap_content"
-        android:layout_height="43dp"
-        android:fontFamily="@font/poppins_regular"
-        android:text="Current"
+        android:layout_width="150dp"
+        android:layout_height="45dp"
+        app:fontFamily="@font/poppins_bold"
+        android:text="CURRENT"
         android:background="@drawable/rounded_button"
         android:textColor="@color/black"
-
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textAllCaps="true"
         android:visibility="gone"
         android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="@id/btn_set_default"

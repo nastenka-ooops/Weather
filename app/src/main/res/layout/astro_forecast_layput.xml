@@ -44,6 +44,17 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tv_daily_advice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/dark_grey"
+            android:background="@drawable/round_grey_shape"
+            android:fontFamily="@font/poppins_semi_bold"
+            android:text="@string/advice"/>
+
+        <TextView
             android:id="@+id/tv_planets"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -30,4 +30,5 @@
     <string name="aspects">ASPECTS</string>
     <string name="natal_wheel_chart">NATAL WHEEL CHART</string>
     <string name="astro_forecast">Astro Forecast</string>
+    <string name="advice">Загрузка совета на день...</string>
 </resources>

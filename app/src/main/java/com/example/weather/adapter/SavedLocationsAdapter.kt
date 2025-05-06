@@ -1,5 +1,6 @@
 package com.example.weather.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,18 +50,19 @@ class SavedLocationsAdapter(
         return ViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val location = locations[position]
         val isDefault = sharedPreferencesHelper.getSelectedLocation()?.name == location.name
-        holder.tvLocationName.text = location.name
-        holder.tvTemperature.text = "${location.temperature}°"
+        holder.tvLocationName.text = location.name + ", " + location.country
+        /*holder.tvTemperature.text = "${location.temperature}°"
 
         if (location.weatherCode != null && location.isDay != null) {
             holder.ivWeatherIcon.setImageResource(
                 weatherUtils.getWeatherIcon(location.weatherCode, location.isDay == 1)
             )
         }
-        holder.ivWeatherIcon.visibility = View.VISIBLE
+        holder.ivWeatherIcon.visibility = View.VISIBLE*/
         holder.btnDelete.visibility = View.VISIBLE
         // Проверяем, является ли эта локация основной
         if (isDefault) {

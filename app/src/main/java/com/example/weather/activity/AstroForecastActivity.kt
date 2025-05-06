@@ -17,6 +17,7 @@ import com.example.weather.dto.astro.AspectsResponse
 import com.example.weather.dto.astro.AstroRequest
 import com.example.weather.dto.astro.NatalWheelChartResponse
 import com.example.weather.dto.astro.PlanetsResponse
+import com.example.whether.R
 import com.example.whether.databinding.AstroForecastLayputBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -24,9 +25,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.io.InputStream
 import java.net.URL
 import java.util.Calendar
 import java.util.Properties
@@ -145,10 +148,26 @@ class AstroForecastActivity : ComponentActivity() {
 
                         val modifiedRequest = request.copy(
                             config = request.config.toMutableMap().apply {
-                                put("allowed_aspects", listOf("Conjunction", "Trine", "Sextile"))
-                                put("exclude_planets", listOf(
-                                    "Lilith", "Chiron", "Ceres", "Vesta", "Juno", "Pallas",
-                                    "True Node", "Mean Node", "IC", "MC", "Descendant", "Ascendant"))
+                                put(
+                                    "allowed_aspects",
+                                    listOf("Conjunction", "Trine", "Sextile", "Square")
+                                )
+                                put(
+                                    "exclude_planets", listOf(
+                                        "Lilith",
+                                        "Chiron",
+                                        "Ceres",
+                                        "Vesta",
+                                        "Juno",
+                                        "Pallas",
+                                        "True Node",
+                                        "Mean Node",
+                                        "IC",
+                                        "MC",
+                                        "Descendant",
+                                        "Ascendant"
+                                    )
+                                )
                             }
                         )
                         retrofit.create(AstrologyApi::class.java).getAspects(modifiedRequest)
@@ -206,9 +225,10 @@ class AstroForecastActivity : ComponentActivity() {
                     val bitmap = withContext(Dispatchers.IO) {
                         val svg = SVG.getFromInputStream(URL(svgUrl).openStream())
                         val picture = svg.renderToPicture()
-                        Bitmap.createBitmap(picture.width, picture.height, Bitmap.Config.ARGB_8888).apply {
-                            Canvas(this).drawPicture(picture)
-                        }
+                        Bitmap.createBitmap(picture.width, picture.height, Bitmap.Config.ARGB_8888)
+                            .apply {
+                                Canvas(this).drawPicture(picture)
+                            }
                     }
 
                     // Switch back to Main thread to update UI
@@ -217,11 +237,43 @@ class AstroForecastActivity : ComponentActivity() {
                     e.printStackTrace()
                 }
             }
+
+            val advices = loadDailyAdviceFromJson()
+            binding.tvDailyAdvice.text = getDailyAdvice(
+                currentDay,
+                planets?.let { it.output[2].zodiac_sign.name.en } ?: "Capricorn",
+                advices
+            )
         }
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
+        }
+    }
+
+    private fun loadDailyAdviceFromJson(): JSONObject {
+        return try {
+            val inputStream: InputStream = resources.openRawResource(R.raw.daily_advice)
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+            JSONObject(jsonString)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            JSONObject() // Возвращаем пустой JSONObject в случае ошибки
+        }
+    }
+
+    private fun getDailyAdvice(dayOfMonth: Int, moonSign: String, adviceJson: JSONObject): String {
+        return try {
+            // Пробуем получить совет для конкретного дня и знака Луны
+            val signAdvice = adviceJson.optJSONObject(moonSign)?.optString(dayOfMonth.toString())
+
+            // Если нет совета для конкретного дня, берем общий совет для знака
+            signAdvice ?: adviceJson.optJSONObject(moonSign)?.optString("general")
+            ?: "Сегодня хороший день, чтобы прислушаться к своей интуиции."
+        } catch (e: Exception) {
+            e.printStackTrace()
+            "Сегодня хороший день, чтобы прислушаться к своей интуиции."
         }
     }
 
