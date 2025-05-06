@@ -44,15 +44,15 @@ class HomeActivity : ComponentActivity() {
         chosenUnits = ChosenUnits(this)
         locationUtils = LocationUtils(this)
         val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
-        if(sharedPreferencesHelper.getFlag()) {
-            locationUtils.getCurrentLocation(
-                onSuccess = { lat, lon ->
-                    val cityName = locationUtils.getCityName(lat, lon)
-                    binding.weatherLayout.tvCityName.text = cityName
-                    fetchWeatherData(lat, lon)
-                }
-            )
-        }
+//        if(sharedPreferencesHelper.getFlag()) {
+//            locationUtils.getCurrentLocation(
+//                onSuccess = { lat, lon ->
+//                    val cityName = locationUtils.getCityName(lat, lon)
+//                    binding.weatherLayout.tvCityName.text = cityName
+//                    fetchWeatherData(lat, lon)
+//                }
+//            )
+//        }
         binding.etSearchLocation.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
@@ -69,13 +69,40 @@ class HomeActivity : ComponentActivity() {
             startActivity(intent)
             finish()
         }
+        loadWeatherData()
+//        if (selectedLocation != null) {
+//            showSelectedLocation(selectedLocation)
+//        } else {
+//            getCurrentLocation()
+//        }
+    }
+
+    private fun loadWeatherData() {
+        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
 
         if (selectedLocation != null) {
-            showSelectedLocation(selectedLocation)
+            // Пытаемся загрузить сохраненные данные
+            val cachedData = sharedPreferencesHelper.getWeatherData(selectedLocation)
+
+            if (cachedData != null) {
+                // Показываем сохраненные данные
+                updateUI(cachedData)
+            } else {
+                // Загружаем свежие данные с API
+                fetchFreshData(selectedLocation)
+            }
         } else {
-            getCurrentLocation()
+            // Используем текущее местоположение
+            locationUtils.getCurrentLocation(
+                onSuccess = { lat, lon ->
+                    val cityName = locationUtils.getCityName(lat, lon)
+                    binding.weatherLayout.tvCityName.text = cityName
+                    fetchWeatherData(lat, lon)
+                }
+            )
         }
     }
+
 
     private fun showSelectedLocation(location: LocationResponse) {
         binding.weatherLayout.tvCityName.text = location.name
@@ -255,31 +282,7 @@ class HomeActivity : ComponentActivity() {
     }
 
 
-    private fun loadWeatherData() {
-        val selectedLocation = sharedPreferencesHelper.getSelectedLocation()
 
-        if (selectedLocation != null) {
-            // Пытаемся загрузить сохраненные данные
-            val cachedData = sharedPreferencesHelper.getWeatherData(selectedLocation)
-
-            if (cachedData != null) {
-                // Показываем сохраненные данные
-                updateUI(cachedData)
-            } else {
-                // Загружаем свежие данные с API
-                fetchFreshData(selectedLocation)
-            }
-        } else {
-            // Используем текущее местоположение
-            locationUtils.getCurrentLocation(
-                onSuccess = { lat, lon ->
-                    val cityName = locationUtils.getCityName(lat, lon)
-                    binding.weatherLayout.tvCityName.text = cityName
-                    fetchWeatherData(lat, lon)
-                }
-            )
-        }
-    }
 
     private fun fetchFreshData(location: LocationResponse) {
         lifecycleScope.launch {

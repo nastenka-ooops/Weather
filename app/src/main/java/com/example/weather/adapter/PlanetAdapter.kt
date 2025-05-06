@@ -21,7 +21,7 @@ class PlanetAdapter: RecyclerView.Adapter<PlanetAdapter.PlanetHolder>() {
         fun bind(planet: PlanetData) = with(binding) {
 
             tvPlanet.text = planet.planet.en.take(5)
-            tvDegree.text = "${"%.2f°".format(planet.normDegree)}°"
+            tvDegree.text = "${"%.2f".format(planet.normDegree)}°"
             tvSingName.text = planet.zodiac_sign.name.en.take(5)
 
             ivPlanetIcon.setImageResource(
