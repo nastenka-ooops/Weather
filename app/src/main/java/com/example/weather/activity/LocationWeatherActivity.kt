@@ -120,17 +120,16 @@ class LocationWeatherActivity : ComponentActivity() {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
-                    val weatherService = weatherRetrofit.create(OpenMeteoApi::class.java)
-                weatherService.getCurrentWeather(
+                val weatherService = weatherRetrofit.create(OpenMeteoApi::class.java)
+                val airQualityService = airQualityRetrofit.create(OpenMeteoApi::class.java)
+
+                val (weatherData, airQualityData) = withContext(Dispatchers.IO) {
+                    val weather = weatherService.getCurrentWeather(
                         lat= lat,
                         lon = lon,
                         windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
                         temperatureUnit = chosenUnits.getApiTemperatureUnit()
                     )
-                val airQualityService = airQualityRetrofit.create(OpenMeteoApi::class.java)
-
-                val (weatherData, airQualityData) = withContext(Dispatchers.IO) {
-                    val weather = weatherService.getCurrentWeather(lat, lon)
                     val airQuality = airQualityService.getAirQuality(lat, lon)
                     Pair(weather, airQuality)
                 }
@@ -157,35 +156,22 @@ class LocationWeatherActivity : ComponentActivity() {
                 )
             )
 
-            tvTemperature.text = "${weatherData.current_weather.temperature}°"
+            tvTemperature.text = "${weatherData.current_weather.temperature} ${weatherData.current_weather_units.temperature}"
 
             currentTime = weatherData.current_weather.time.substring(11, 16)
-            tvTime.text = currentTime
 
-            tvUv.text = weatherData.daily.uv_index_max[0].toString()
-
-            tvRain.text = "${weatherData.daily.precipitation_probability_mean[0]}%"
-
-            tvWind.text = weatherData.current_weather.windspeed.toString()
-
-            tvSunrise.text = weatherData.daily.sunrise[0].substring(11, 16)
             val sunset = weatherData.daily.sunset[0].substring(11, 16)
-            tvSunset.text = sunset
 
             val daylight = weatherData.daily.daylight_duration[0]
             val daylightHours = (daylight / 3600).toInt()
             val daylightMinutes = ((daylight - daylightHours * 3600) / 60).toInt()
-            tvLengthUfDay.text = "${daylightHours}H ${daylightMinutes}M"
-
             val remainingDaylight = calculateRemainingDaylight(sunset, currentTime)
-            tvRemainingDaylight.text = remainingDaylight
 
             tvLengthOfDay.text = "${daylightHours}H ${daylightMinutes}M"
             tvRemDaylight.text = remainingDaylight
 
             val sunriseTime = weatherData.daily.sunrise[0].substring(11, 16)
-            val sunsetTime = weatherData.daily.sunset[0].substring(11, 16)
-            binding.weatherLayout.sunPositionView.updateTime(sunriseTime, sunsetTime, LocalTime.now())
+            binding.weatherLayout.sunPositionView.updateTime(sunriseTime, sunset, LocalTime.now())
 
         }
         hourlyAdapter = HourlyWeatherAdapter()
@@ -235,17 +221,19 @@ class LocationWeatherActivity : ComponentActivity() {
         val weatherDetails = listOf(
             WeatherDetail(
                 "Wind",
-                "${weatherData.current_weather.windspeed} km/h",
-                "Gusts ${weatherData.daily.wind_gusts_10m_max[0]} km/h"
+                "${weatherData.current_weather.windspeed} ${weatherData.current_weather_units.windspeed}",
+                "Gusts ${weatherData.daily.wind_gusts_10m_max[0]} ${weatherData.current_weather_units.windspeed}"
             ),
             WeatherDetail(
                 "Humidity",
                 "${weatherData.hourly.relative_humidity_2m[currentIndex]}%",
-                "The dew point is ${weatherData.hourly.dew_point_2m[currentIndex]}°C right now"
+                "The dew point is ${weatherData.hourly.dew_point_2m[currentIndex]}"+
+                        "${weatherData.hourly_units.dew_point_2m} right now"
             ),
             WeatherDetail(
                 "Pressure",
-                "${weatherData.hourly.surface_pressure[currentIndex]} hPa",
+                "${weatherData.hourly.surface_pressure[currentIndex]} "+
+                        weatherData.hourly_units.surface_pressure,
                 ""
             ),
             WeatherDetail(
@@ -256,15 +244,25 @@ class LocationWeatherActivity : ComponentActivity() {
             WeatherDetail(
                 "Precipitation",
                 "${weatherData.daily.precipitation_sum[0]} mm",
-                "${weatherData.daily.precipitation_sum.sum()} mm is expected in next 7 days"
+                "${"%.2f".format(weatherData.daily.precipitation_sum.sum())} mm is expected in next 7 days"
             ),
             WeatherDetail(
                 "Air Quality Index",
                 "${airQualityData.current.european_aqi}",
                 AirQualityUtils.getAqiDescription(airQualityData.current.european_aqi)
-
+            ),
+            WeatherDetail(
+                "UV Index",
+                "${weatherData.hourly.uv_index[currentIndex]}",
+                "The maximum UV index is ${weatherData.daily.uv_index_max[0]}"
+            ),
+            WeatherDetail(
+                "Rain probability",
+                "${weatherData.hourly.rain[currentIndex]} %",
+                ""
             )
         )
+
 
         val recyclerView = findViewById<RecyclerView>(R.id.weatherDetailsRecyclerView)
         recyclerView.layoutManager = GridLayoutManager(

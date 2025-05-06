@@ -60,11 +60,9 @@ class SunPositionView @JvmOverloads constructor(
     // Values
     private var sunriseTime: LocalTime = LocalTime.of(6, 7)
     private var sunsetTime: LocalTime = LocalTime.of(12, 2)
-    private var nowTime: LocalTime = LocalTime.of(20, 0)
+    private var nowTime: LocalTime = LocalTime.of(10, 0)
 
     private var currentSunPosition: Float = 0f
-    private var lengthOfDay: String = ""
-    private var remainingDaylight: String = ""
 
     private val arcRect = RectF()
 
@@ -74,6 +72,7 @@ class SunPositionView @JvmOverloads constructor(
         val formatter = DateTimeFormatter.ofPattern("HH:mm")
         sunriseTime = LocalTime.parse(sunrise, formatter)
         sunsetTime = LocalTime.parse(sunset, formatter)
+        nowTime = now
 
         // Проверка: день или ночь
         if (now.isBefore(sunriseTime) || now.isAfter(sunsetTime)) {
@@ -205,6 +204,7 @@ class SunPositionView @JvmOverloads constructor(
         val sunXPosition: Float
         val sunYPosition: Float
         val circlePaint: Paint
+
         when {
             nowMinute < sunriseMinute -> {
                 // Левая ночная парабола
@@ -236,10 +236,10 @@ class SunPositionView @JvmOverloads constructor(
         canvas.drawLine(sunX(sunsetMinute), horizonHeight, sunX(sunsetMinute), horizonHeight - height * 0.25f, linePaint)
 
         canvas.drawText("Sunrise", sunX(sunriseMinute), height * 0.22f, textPaint)
-        canvas.drawText(sunriseTime.format(formatter), sunX(sunriseMinute), height * 0.28f, boldTextPaint)
+        canvas.drawText(sunriseTime.format(formatter), sunX(sunriseMinute), height * 0.29f, boldTextPaint)
 
         canvas.drawText("Sunset", sunX(sunsetMinute), height * 0.22f, textPaint)
-        canvas.drawText(sunsetTime.format(formatter), sunX(sunsetMinute), height * 0.28f, boldTextPaint)
+        canvas.drawText(sunsetTime.format(formatter), sunX(sunsetMinute), height * 0.29f, boldTextPaint)
     }
 
 

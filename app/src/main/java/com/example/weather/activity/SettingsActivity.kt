@@ -51,9 +51,8 @@ class SettingsActivity : ComponentActivity() {
 
         val choiceGroup1: RadioGroup = findViewById(R.id.choiceGroup1)
         val choiceGroup2: RadioGroup = findViewById(R.id.choiceGroup2)
-        val choiceGroup3: RadioGroup = findViewById(R.id.choiceGroup3)
 
-        restoreRadioGroupSelections(choiceGroup1, choiceGroup2, choiceGroup3)
+        restoreRadioGroupSelections(choiceGroup1, choiceGroup2)
 
         // Установка слушателей изменений
         choiceGroup1.setOnCheckedChangeListener { _, checkedId ->
@@ -68,19 +67,14 @@ class SettingsActivity : ComponentActivity() {
             }
         }
 
-        choiceGroup3.setOnCheckedChangeListener { _, checkedId ->
-            findViewById<RadioButton>(checkedId)?.text?.toString()?.let {
-                chosenUnits.pressureUnit = it
-            }
-        }
+
 
     }
 
 
     private fun restoreRadioGroupSelections(
         group1: RadioGroup,
-        group2: RadioGroup,
-        group3: RadioGroup
+        group2: RadioGroup
     ) {
         // Для Temperature
         selectRadioButtonByText(group1, chosenUnits.temperatureUnit)
@@ -88,8 +82,6 @@ class SettingsActivity : ComponentActivity() {
         // Для Wind speed
         selectRadioButtonByText(group2, chosenUnits.windSpeedUnit)
 
-        // Для Pressure
-        selectRadioButtonByText(group3, chosenUnits.pressureUnit)
     }
     private fun selectRadioButtonByText(radioGroup: RadioGroup, text: String) {
         for (i in 0 until radioGroup.childCount) {
@@ -112,7 +104,7 @@ class SettingsActivity : ComponentActivity() {
         chosenUnits.pressureUnit = "mmHg"
 
         // Обновление UI
-        restoreRadioGroupSelections(group1, group2, group3)
+        restoreRadioGroupSelections(group1, group2)
     }
 
     private fun setupRecyclerView() {

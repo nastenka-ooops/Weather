@@ -63,137 +63,17 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Weather Metrics -->
-    <LinearLayout
-        android:id="@+id/ll_whether_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_grey_shape"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        android:weightSum="4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll_city">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/time"
-                android:textColor="@color/grey"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/time"
-                android:textColor="@color/dark_grey"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/uv"
-                android:textColor="@color/grey"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_uv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/uv"
-                android:textColor="@color/dark_grey"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/rain"
-                android:textColor="@color/grey"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_rain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/rain"
-                android:textColor="@color/dark_grey"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/wind"
-                android:textColor="@color/grey"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_wind"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/wind"
-                android:textColor="@color/dark_grey"
-                android:textSize="16sp" />
-        </LinearLayout>
-    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/weatherDetailsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:clipToPadding="false"
             android:scrollbars="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ll_whether_info"/>
+            app:layout_constraintTop_toBottomOf="@id/ll_city"/>
 
 
     <TextView
@@ -247,154 +127,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_daily_forecast" />
 
-    <TextView
-        android:id="@+id/tv_sun"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginVertical="10dp"
-        android:fontFamily="@font/poppins_regular"
-        android:text="@string/sunrise_amp_sunset"
-        android:textColor="@color/grey"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rv_daily_forecast" />
 
-    <!-- Sunrise/Sunset Card -->
-    <LinearLayout
-        android:id="@+id/ll_sun_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/round_grey_shape"
-        android:orientation="vertical"
-        android:padding="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_sun">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/sunrise"
-                    android:textColor="@color/grey"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_sunrise"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/sunrise"
-                    android:textColor="@color/dark_grey"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/sunset"
-                    android:textColor="@color/grey"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_sunset"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/sunset"
-
-                    android:textColor="@color/dark_grey"
-                    android:textSize="18sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/length_of_day"
-                    android:textColor="@color/grey"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_length_uf_day"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/length_of_day"
-                    android:textColor="@color/dark_grey"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/remaining_daylight"
-                    android:textColor="@color/grey"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_remaining_daylight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/daylight"
-                    android:textColor="@color/dark_grey"
-                    android:textSize="18sp" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
+     <LinearLayout
             android:id="@+id/sunCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -402,7 +136,7 @@
             android:layout_marginTop="16dp"
             android:padding="16dp"
             android:background="@drawable/bordered_background"
-            app:layout_constraintTop_toBottomOf="@+id/ll_sun_info"
+            app:layout_constraintTop_toBottomOf="@+id/rv_daily_forecast"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

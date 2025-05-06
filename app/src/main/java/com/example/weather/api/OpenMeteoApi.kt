@@ -15,7 +15,7 @@ interface OpenMeteoApi {
         @Query("longitude") lon: Double,
         @Query("current_weather") currentWeather: Boolean = true,
         @Query("hourly") hourly: String = "temperature_2m,weather_code,is_day,relative_humidity_2m,surface_pressure,visibility,"+
-        "dew_point_2m,precipitation",
+        "dew_point_2m,precipitation,uv_index,rain",
         @Query("daily") daily: String = "precipitation_sum,sunrise,sunset,uv_index_max,precipitation_probability_mean," +
                 "daylight_duration,temperature_2m_max,temperature_2m_min,weather_code,wind_gusts_10m_max",
 
