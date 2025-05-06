@@ -230,9 +230,9 @@ class HomeActivity : ComponentActivity() {
             )
         binding.weatherLayout.rvHourlyForecast.adapter = hourlyAdapter
         val hourlyWeatherItems = weatherData.hourly.time.indices
-            .filter { index ->
+            .dropWhile { index ->
                 val hour = weatherData.hourly.time[index].substring(11, 13).toInt()
-                hour >= currentTime.substring(0,2).toInt()
+                hour < currentTime.substring(0,2).toInt()
             }
             .map { index ->
                 HourlyWeatherItem(
