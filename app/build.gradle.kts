@@ -80,6 +80,10 @@ dependencies {
     implementation (libs.play.services.location)
     implementation( libs.androidx.cardview)
     implementation(libs.androidx.recyclerview)
+
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.4.5")
+
     implementation (libs.androidsvg)
 
 }

@@ -7,22 +7,26 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.adapter.DailyWeatherAdapter
 import com.example.weather.adapter.HourlyWeatherAdapter
+import com.example.weather.adapter.WeatherDetailAdapter
 import com.example.weather.api.OpenMeteoApi
-import com.example.weather.dto.DailyWeatherItem
-import com.example.weather.dto.HourlyWeatherItem
-import com.example.weather.dto.LocationResponse
-import com.example.weather.dto.WeatherResponse
+import com.example.weather.dto.*
+import com.example.weather.utils.AirQualityUtils
 import com.example.weather.utils.SharedPreferencesHelper
 import com.example.weather.utils.WeatherUtils
+import com.example.weather.view.SunPositionView
+import com.example.whether.R
 import com.example.whether.databinding.HomeLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import org.threeten.bp.LocalTime
 
 class HomeActivity : ComponentActivity() {
     private lateinit var binding: HomeLayoutBinding
@@ -142,23 +146,30 @@ class HomeActivity : ComponentActivity() {
     private fun fetchWeatherData(lat: Double, lon: Double) {
         lifecycleScope.launch {
             try {
-                val weatherData = withContext(Dispatchers.IO) {
-                    val retrofit = Retrofit.Builder()
-                        .baseUrl("https://api.open-meteo.com/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build()
+                val weatherRetrofit = Retrofit.Builder()
+                    .baseUrl("https://api.open-meteo.com/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                val airQualityRetrofit = Retrofit.Builder()
+                    .baseUrl("https://air-quality-api.open-meteo.com/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
 
-                    val service = retrofit.create(OpenMeteoApi::class.java)
-                    service.getCurrentWeather(
+                val weatherService = weatherRetrofit.create(OpenMeteoApi::class.java)
+                val airQualityService = airQualityRetrofit.create(OpenMeteoApi::class.java)
+
+                val (weatherData, airQualityData) = withContext(Dispatchers.IO) {
+                    val weather = weatherService.getCurrentWeather(
                         lat= lat,
                         lon = lon,
                         windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
                         temperatureUnit = chosenUnits.getApiTemperatureUnit()
                     )
-
+                    val airQuality = airQualityService.getAirQuality(lat, lon)
+                    Pair(weather, airQuality)
                 }
 
-                updateUI(weatherData)
+                updateUI(weatherData, airQualityData)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -184,8 +195,9 @@ class HomeActivity : ComponentActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateUI(weatherData: WeatherResponse) {
+    private fun updateUI(weatherData: WeatherResponse, airQualityData: AirQualityResponse) {
         val currentTime: String
+        val sunset: String
         binding.weatherLayout.apply {
             val isDay = weatherData.current_weather.is_day == 1
 
@@ -208,7 +220,7 @@ class HomeActivity : ComponentActivity() {
             tvWind.text = weatherData.current_weather.windspeed.toString()
 
             tvSunrise.text = weatherData.daily.sunrise[0].substring(11, 16)
-            val sunset = weatherData.daily.sunset[0].substring(11, 16);
+            sunset = weatherData.daily.sunset[0].substring(11, 16);
             tvSunset.text = sunset
 
             val daylight = weatherData.daily.daylight_duration[0]
@@ -218,6 +230,14 @@ class HomeActivity : ComponentActivity() {
 
             val remainingDaylight = calculateRemainingDaylight(sunset, currentTime)
             tvRemainingDaylight.text = remainingDaylight
+
+            tvLengthOfDay.text = "${daylightHours}H ${daylightMinutes}M"
+            tvRemDaylight.text = remainingDaylight
+
+            val sunriseTime = weatherData.daily.sunrise[0].substring(11, 16)
+            val sunsetTime = weatherData.daily.sunset[0].substring(11, 16)
+            binding.weatherLayout.sunPositionView.updateTime(sunriseTime, sunsetTime, LocalTime.now())
+
         }
 
         hourlyAdapter = HourlyWeatherAdapter()
@@ -258,6 +278,62 @@ class HomeActivity : ComponentActivity() {
                 )
             }
         dailyAdapter.setWeatherList(dailyWeatherItems)
+
+
+        val currentIndex = weatherData.hourly.time.indexOfFirst {
+            it.substring(11, 16) == currentTime
+        }.takeIf { it != -1 } ?: 0 // fallback на 0, если не найдено
+
+        val weatherDetails = listOf(
+            WeatherDetail(
+                "Wind",
+                "${weatherData.current_weather.windspeed} km/h",
+                "Gusts ${weatherData.daily.wind_gusts_10m_max[0]} km/h"
+            ),
+            WeatherDetail(
+                "Humidity",
+                "${weatherData.hourly.relative_humidity_2m[currentIndex]}%",
+                "The dew point is ${weatherData.hourly.dew_point_2m[currentIndex]}°C right now"
+            ),
+            WeatherDetail(
+                "Pressure",
+                "${weatherData.hourly.surface_pressure[currentIndex]} hPa",
+                ""
+            ),
+            WeatherDetail(
+                "Visibility",
+                "${weatherData.hourly.visibility[currentIndex] / 1000} km",
+                ""
+            ),
+            WeatherDetail(
+                "Precipitation",
+                "${weatherData.daily.precipitation_sum[0]} mm",
+                "${weatherData.daily.precipitation_sum.sum()} mm is expected in next 7 days"
+            ),
+            WeatherDetail(
+                "Air Quality Index",
+                "${airQualityData.current.european_aqi}",
+                AirQualityUtils.getAqiDescription(airQualityData.current.european_aqi)
+
+            )
+        )
+
+        val recyclerView = findViewById<RecyclerView>(R.id.weatherDetailsRecyclerView)
+        recyclerView.layoutManager = GridLayoutManager(
+            this,
+            2, // Кол-во строк
+            GridLayoutManager.HORIZONTAL,
+            false
+        )
+        recyclerView.adapter = WeatherDetailAdapter(weatherDetails)
+
+
+        val daylight = weatherData.daily.daylight_duration[0]
+        val daylightHours = (daylight / 3600).toInt()
+        val daylightMinutes = ((daylight - daylightHours * 3600) / 60).toInt()
+
+
+
     }
 
     private fun calculateRemainingDaylight(sunset: String, curent: String): String {

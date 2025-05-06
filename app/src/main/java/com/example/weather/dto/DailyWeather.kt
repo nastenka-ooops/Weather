@@ -9,5 +9,8 @@ data class DailyWeather(
     val temperature_2m_max: List<Float>,
     val temperature_2m_min: List<Float>,
     val weather_code: List<Int>,
-    val time: List<String>
+    val time: List<String>,
+    val wind_gusts_10m_max: List<Float>,
+    val precipitation_sum: List<Float>
+
 )

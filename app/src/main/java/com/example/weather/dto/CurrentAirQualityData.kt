@@ -1,17 +1,19 @@
 package com.example.weather.dto
 
+
 data class CurrentAirQualityData(
-    val time: String,
-    val interval: Int,
-    val pm10: Float,
-    val pm2_5: Float,
-    val carbon_monoxide: Float,
-    val nitrogen_dioxide: Float,
-    val sulphur_dioxide: Float,
-    val ozone: Float,
-    val aerosol_optical_depth: Float,
-    val dust: Float,
-    val uv_index: Float,
-    val ammonia: Float,
-    val european_aqi: Int?
+    val time: String, // Время получения данных
+    val interval: Int, // Интервал
+    val pm10: Float?, // Частицы PM10
+    val pm2_5: Float?, // Частицы PM2.5
+    val carbon_monoxide: Float?, // Углеродный оксид
+    val nitrogen_dioxide: Float?, // Диоксид азота
+    val sulphur_dioxide: Float?, // Диоксид серы
+    val ozone: Float?, // Озон
+    val aerosol_optical_depth: Float?, // Оптическая плотность аэрозоля
+    val dust: Float?, // Пыль
+    val uv_index: Float?, // Ультрафиолетовый индекс
+    val ammonia: Float?, // Аммиак
+    val european_aqi: Int? // Европейский индекс качества воздуха (AQI)
 )
+
