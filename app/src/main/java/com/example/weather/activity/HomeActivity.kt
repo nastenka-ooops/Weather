@@ -18,7 +18,6 @@ import com.example.weather.dto.*
 import com.example.weather.utils.AirQualityUtils
 import com.example.weather.utils.SharedPreferencesHelper
 import com.example.weather.utils.WeatherUtils
-import com.example.weather.view.SunPositionView
 import com.example.whether.R
 import com.example.whether.databinding.HomeLayoutBinding
 import kotlinx.coroutines.Dispatchers
@@ -86,11 +85,11 @@ class HomeActivity : ComponentActivity() {
 
         if (selectedLocation != null) {
             // Пытаемся загрузить сохраненные данные
-            val cachedData = sharedPreferencesHelper.getWeatherData(selectedLocation)
-
-            if (cachedData != null) {
+            val weatherData = sharedPreferencesHelper.getWeatherData(selectedLocation)
+            val airQualityData = sharedPreferencesHelper.getAirQualityData(selectedLocation)
+            if (weatherData != null && airQualityData != null) {
                 // Показываем сохраненные данные
-                updateUI(cachedData)
+                updateUI(weatherData, airQualityData)
             } else {
                 // Загружаем свежие данные с API
                 fetchFreshData(selectedLocation)
@@ -363,30 +362,33 @@ class HomeActivity : ComponentActivity() {
     private fun fetchFreshData(location: LocationResponse) {
         lifecycleScope.launch {
             try {
+                val weatherRetrofit = Retrofit.Builder()
+                    .baseUrl("https://api.open-meteo.com/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                val airQualityRetrofit = Retrofit.Builder()
+                    .baseUrl("https://air-quality-api.open-meteo.com/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
 
-                val weatherData = withContext(Dispatchers.IO) {
-                    val retrofit = Retrofit.Builder()
-                        .baseUrl("https://api.open-meteo.com/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build()
+                val weatherService = weatherRetrofit.create(OpenMeteoApi::class.java)
+                val airQualityService = airQualityRetrofit.create(OpenMeteoApi::class.java)
 
-                    val service = retrofit.create(OpenMeteoApi::class.java)
-                    service.getCurrentWeather(
+                val (weatherData, airQualityData) = withContext(Dispatchers.IO) {
+                    val weather = weatherService.getCurrentWeather(
                         lat= location.latitude,
                         lon = location.longitude,
                         windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
                         temperatureUnit = chosenUnits.getApiTemperatureUnit()
                     )
-
+                    val airQuality = airQualityService.getAirQuality(location.latitude, location.longitude)
+                    Pair(weather, airQuality)
                 }
-                // Сохраняем новые данные
-                sharedPreferencesHelper.saveWeatherData(location, weatherData, null)
+                sharedPreferencesHelper.saveWeatherData(location, weatherData, airQualityData)
 
-                // Обновляем UI
-                updateUI(weatherData)
+                updateUI(weatherData, airQualityData)
             } catch (e: Exception) {
                 e.printStackTrace()
-                // Обработка ошибки
             }
         }
     }

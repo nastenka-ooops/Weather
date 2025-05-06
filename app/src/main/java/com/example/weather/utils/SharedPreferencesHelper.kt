@@ -16,6 +16,7 @@ class SharedPreferencesHelper(context: Context) {
     private val LOCATIONS_KEY = "saved_locations"
     private val SELECTED_LOCATION_KEY = "selected_location"
     private val WEATHER_DATA_KEY = "weather_data_"
+    private val AIR_DATA_KEY = "air_data_"
     private val sharedflag = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
     private val CACHE_DURATION = 2 * 60 * 60 * 1000
 
@@ -36,10 +37,11 @@ class SharedPreferencesHelper(context: Context) {
         }
     }
 
-    fun saveWeatherData(location: LocationResponse, weather: WeatherResponse, airQuality: AirQualityResponse?) {
+    fun saveWeatherData(location: LocationResponse, weather: WeatherResponse, airQuality: AirQualityResponse) {
         val data = mapOf(
             "weather" to gson.toJson(weather),
-            "lastUpdated" to System.currentTimeMillis()
+            "lastUpdated" to System.currentTimeMillis(),
+            "air" to gson.toJson(airQuality)
         )
         val json = gson.toJson(data)
         sharedPreferences.edit()
@@ -59,6 +61,19 @@ class SharedPreferencesHelper(context: Context) {
         val weatherJson = data["weather"] as? String ?: return null
         return gson.fromJson(weatherJson, WeatherResponse::class.java)
     }
+
+    fun getAirQualityData(location: LocationResponse): AirQualityResponse? {
+        val json = sharedPreferences.getString("$AIR_DATA_KEY${location.name}", null) ?: return null
+        val data = gson.fromJson(json, object : TypeToken<Map<String, Any>>() {}.type) as? Map<String, Any>
+
+        // Проверяем, не устарели ли данные
+        val lastUpdated = data?.get("lastUpdated") as? Long ?: return null
+        if (System.currentTimeMillis() - lastUpdated > CACHE_DURATION) return null
+
+        val airJson = data["air"] as? String ?: return null
+        return gson.fromJson(airJson, AirQualityResponse::class.java)
+    }
+
     fun isSavedLockation(location: LocationResponse): Boolean {
         val savedLocations = getSavedLocations().toMutableList();
         if(savedLocations.any {it.name == location.name})
@@ -128,6 +143,7 @@ class SharedPreferencesHelper(context: Context) {
     fun getFlag(): Boolean {
         return sharedflag.getBoolean("MY_FLAG_KEY", false) // false - значение по умолчанию
     }
+
 
 
 }

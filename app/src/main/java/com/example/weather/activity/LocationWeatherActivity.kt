@@ -120,17 +120,16 @@ class LocationWeatherActivity : ComponentActivity() {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
-                    val weatherService = weatherRetrofit.create(OpenMeteoApi::class.java)
-                weatherService.getCurrentWeather(
+                val weatherService = weatherRetrofit.create(OpenMeteoApi::class.java)
+                val airQualityService = airQualityRetrofit.create(OpenMeteoApi::class.java)
+
+                val (weatherData, airQualityData) = withContext(Dispatchers.IO) {
+                    val weather = weatherService.getCurrentWeather(
                         lat= lat,
                         lon = lon,
                         windSpeedUnit = chosenUnits.getApiWindSpeedUnit(),
                         temperatureUnit = chosenUnits.getApiTemperatureUnit()
                     )
-                val airQualityService = airQualityRetrofit.create(OpenMeteoApi::class.java)
-
-                val (weatherData, airQualityData) = withContext(Dispatchers.IO) {
-                    val weather = weatherService.getCurrentWeather(lat, lon)
                     val airQuality = airQualityService.getAirQuality(lat, lon)
                     Pair(weather, airQuality)
                 }
